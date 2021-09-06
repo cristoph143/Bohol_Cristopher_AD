@@ -1,14 +1,34 @@
+var numb = 1;
+var str = 'Str';
+var bol = true;
+var und;
+var nll = null;
+var arr = [1,2,3];
+var arr1 = [1,2,'3'];
+var arr2 =  [1,[2],'3'];
+var arr3 = [1,false,'3'];
+
 var num = {
-    num: 1,
-    str: 'Str',
-    bol: true,
-    nll: null,
-    arr: [1,2,3],
-    arr1: [1,2,'3'],
-    arr2: [1,[2],'3'],
-    arr3: [1,false,'3']
+    num: numb,
+    str: str,
+    bol: bol,
+    nll: nll,
+    arr: arr,
+    arr1: arr1,
+    arr2: arr2,
+    arr3: arr3
 };
 
+
+console.log(`The Variable ${numb} is of typeof ${typeof numb}`)
+console.log(`The Variable ${str} is of typeof ${typeof str}`)
+console.log(`The Variable ${bol} is of typeof ${typeof bol}`)
+console.log(`The Variable ${nll} is of typeof ${typeof nll}`)
+console.log(`The Variable ${arr} is of typeof ${typeof arr}`)
+console.log(`The Variable ${arr1} is of typeof ${typeof arr1}`)
+console.log(`The Variable ${arr2} is of typeof ${typeof arr2}`)
+console.log(`The Variable ${arr3} is of typeof ${typeof arr3}`)
+console.log('')
 console.log(`The Variable ${num} is of typeof ${typeof num}`)
 console.log(`The Variable ${num.num} is of typeof ${typeof num.num}`)
 console.log(`The Variable ${num[num]} is of typeof ${typeof num[num]}`)
