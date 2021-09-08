@@ -1,8 +1,13 @@
 function loopsMul(base){
     let newStr = "";
+    let prod = 0;
     for (let i = 1; i <= base; i++) {
         for (let j = 1; j <= base; j++) {
-            newStr += `${i*j}   `;
+            prod = i*j;
+            newStr += prod;
+            if(prod < 10)
+                newStr += ' ';                                         
+            newStr += ' ';
         }
         newStr += "\n";
     }
