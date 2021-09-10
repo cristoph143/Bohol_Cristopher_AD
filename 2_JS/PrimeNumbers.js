@@ -20,13 +20,19 @@ function primeNumber(num){
     */
     for(let i = 2; i <= val; i++){
         if(num % i == 0){
-            console.log(`${i} ${val} ${num}`)
             cnt = 1;
+            console.log(`${i} ${val} ${num} ${cnt}`)
+            break;
         }
+        console.log(`${i} ${val} ${num} ${cnt}`)
     }
     return ((cnt == 0 && num != 1) || (num == 2 || num == 3)) 
             ? true : false;
 }
-
+//prime
 console.log('5 is a prime number? ' + primeNumber(5));
+console.log('211 is a prime number? ' + primeNumber(211));
+
+//not prime
 console.log('6 is a prime number? ' + primeNumber(6));
+console.log('221 is a prime number? ' + primeNumber(221));
