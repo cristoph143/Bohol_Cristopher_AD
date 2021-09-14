@@ -121,6 +121,24 @@ export class Exercise3Service {
         this.logAllCars();
     }//Overrides the first value since it has the same key
 
+    replaceCar(id:string, car:any){
+        var newCar:Car;
+        newCar = new Car(car?.color, car?.models,{name: car?.wheel?.name,radius: car?.wheel?.radius});
+        this.cars.set(id,newCar);
+        this.logAllCars();
+    }//Overrides the value with it's new body
+
+    deleteCar(id:string){
+        console.log('----------------------------------------------------------------\n')
+        if(this.cars.has(id)){
+            this.cars.delete(id);
+            console.log(`\t${id} has been deleted successfuly!`);
+        }
+        else
+            console.log(`\t${id} has not been found in the database!`);
+        console.log('\n----------------------------------------------------------------')
+    }
+
     logAllCars(){
         console.log('--------------------------------')
         console.log('Log of All Cars')
@@ -129,6 +147,48 @@ export class Exercise3Service {
             console.log(car.toJson());
             car.log();
         }
-        console.log('--------------------------------')
+        console.log('----------------------------------------------------------------')
+    }
+
+    //If Array of Objects
+    private cars2:Array<{}> = [
+        {
+            "id": "ID14345",
+            "color": "Pinks",
+            "models": "SUVs",
+            "wheel": {
+                "name": "Webbers",
+                "radius": 101
+            }
+        },
+        {
+            "id": "ID80901",
+            "color": "Sky Blue",
+            "models": "Toyota",
+            "wheel": {
+                "name": "Programmer",
+                "radius": 304
+            }
+        }
+    ];
+
+    searchCar(){
+        for(const car of this.cars2){
+            if(car['id'] === 'ID80901')
+            return car;
+        }
+    }
+
+    getCar(id:string){
+        console.log('----------------------------------------------------------------\n')
+        if(this?.cars?.get(id) === undefined){
+            console.log(`\t${id} does not exist in the database!`);
+            console.log(`\n----------------------------------------------------------------`);
+        }
+        else{
+            console.log(`\t${id} is now Collected!`);
+            console.log(`\n----------------------------------------------------------------`);
+            return this.cars.get(id).toJson;
+        }
     }
 }
