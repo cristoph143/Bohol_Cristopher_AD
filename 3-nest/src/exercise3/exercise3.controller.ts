@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put} from '@nestjs/common';
 import { Exercise3Service } from './exercise3.service';
 
 
@@ -72,5 +72,19 @@ export class Exercise3Controller {
     simplePostAddCar4(@Body() body:any){
         return this.e3.simplePostAddCar4(body);
     }//return all of the content of JSON
+    @Put('/replaceCar/:id')
+    replaceCar(@Param('id') id:string, @Body() body:any){
+        return this.e3.replaceCar(id,body);
+    }//return all of the content of JSON
+    @Delete('/deleteCar/:id')
+    deleteCar(@Param('id') id:string){
+        return this.e3.deleteCar(id);
+    }//return all of the content of JSON
+
+    @Get('/getCar/:id')
+    getCar(@Param('id') id:string){
+        return this.e3.getCar(id);
+    }
+    
 }
 
