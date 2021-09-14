@@ -1,18 +1,24 @@
+import { HTML } from './html.helper';
 import { Injectable } from '@nestjs/common';
+import { Car } from './car.model';
 
 @Injectable()
-export class Exercise3Service {
+export class Exercise3Service {    
     //Loops Triangle
     triangle (height: number) {
+        var html: HTML = new HTML();
         let newStr = "";
         for (let i = 0; i < height; i++) {
-            for (let j = 0; j <= i; j++) {
-                newStr += "*";
+            let j = i;
+            while(j){
+                newStr += '*';
+                j--; 
             }
-            newStr += "\n";
+            html.add(html.div([newStr]));
         }
-    console.log(newStr);
-    return newStr;
+        
+        console.log(newStr);
+        return html.renderScreenHTML();
     }
     //Hello Name
     helloName(name: string){
@@ -53,5 +59,54 @@ export class Exercise3Service {
         }
         console.log(newStr);
         return newStr;
+    }
+
+    private cars:Map<string,Car> = new Map<string, Car>();
+
+    simpleAddCar(){
+        var me:Car;
+        me = new Car('Red', 'Mitsubishi',{name:'Hello',radius: 20});
+        console.log(me);
+        this.cars.set('Zero', me);
+        this.logAllCars();
+    }
+
+    simpleAddCar1(){
+        var me:Car;
+        me = new Car('Blue', 'Mercedes',{name:'World',radius: 40});
+        this.cars.set('First', me);
+        this.logAllCars();
+    }
+
+    simpleAddCar2(){
+        var me:Car;
+        me = new Car('Green', 'Toyota',{name:'My Friend',radius: 80});
+        this.cars.set('Second',me);
+        this.logAllCars();
+    }
+
+    simpleAddCar3(){
+        var me:Car;
+        me = new Car('Yellow', 'Toyota',{name:'My Friend',radius: 80});
+        this.cars.set('Second',me);
+        this.logAllCars();
+    }//Overrides the first value since it has the same key
+
+    simplePostAddCar4(car:any){
+        var newCar:Car;
+        newCar = new Car(car?.color, car?.models,{name: car?.wheel?.name,radius: car?.wheel?.radius});
+        this.cars.set(car.id,newCar);
+        this.logAllCars();
+    }//Overrides the first value since it has the same key
+
+    logAllCars(){
+        console.log('--------------------------------')
+        console.log('Log of All Cars')
+        for(const [key,car] of this.cars.entries()){
+            console.log(`Key: ${key}`);
+            console.log(car.toJson());
+            car.log();
+        }
+        console.log('--------------------------------')
     }
 }
