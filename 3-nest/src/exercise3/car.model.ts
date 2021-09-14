@@ -11,7 +11,7 @@ export class Car{
         this.wheels = wheels;
     }
     log(){
-        console.log(`I have ${this?.color} ${this?.models} with ${this?.wheels?.name} and ${this?.wheels?.radius}.`);
+        console.log(`I have ${this?.color} ${this?.models} with ${this?.wheels?.name} and ${this?.wheels.radius}.`);
     }
 
     toJson(){

@@ -8,13 +8,11 @@ export class Exercise3Service {
     triangle (height: number) {
         var html: HTML = new HTML();
         let newStr = "";
-        for (let i = 0; i < height; i++) {
-            let j = i;
-            while(j){
+        for (let i = 1; i <= height; i++) {
+            for(let j = 0; j < i; j++)
                 newStr += '*';
-                j--; 
-            }
             html.add(html.div([newStr]));
+            newStr  = '';
         }
         
         console.log(newStr);
@@ -40,25 +38,49 @@ export class Exercise3Service {
     }
     //Multiplication Table
     loopsMul(base){
+        var html: HTML = new HTML();
         let newStr = "";
         let prod = 0;
         for (let i = 1; i <= base; i++) {
             for (let j = 1; j <= base; j++) {
                 prod = i*j;
-                newStr += prod;
-                if(prod > 99) 
-                    newStr += '  ';
-                if(prod < 100)
-                    newStr += '   ';
+
+                if(base > 9){
+                    if(prod > 99){
+                        newStr += `${prod} `;
+                    }
+                    if(prod > 9 && prod < 100){
+                        newStr += `0${prod} `;
+                    }
                     if(prod < 10)
-                        newStr += ' ';
-                    newStr += ' ';
-                newStr += '';
+                        newStr += `00${prod} `;
+                }
+                else if(base > 3){
+                    if(prod > 9){
+                        newStr += `${prod} `;
+                    }
+                    if(prod < 10)
+                        newStr += `0${prod} `;
+                }
+                else     
+                    if(prod < 10)
+                        newStr += `${prod} `;
+                // if(prod > 99) 
+                //     newStr += '   ';
+                // if(prod < 100)
+                //     newStr += '    ';
+                //     if(prod < 10)
+                //         newStr += ' ';
+                //     newStr += ' ';
+                // newStr += '';
+                
+                //newStr += prod;
             }
-            newStr += "\n";
+            html.add(html.div([newStr]));
+            newStr  = '';
         }
         console.log(newStr);
-        return newStr;
+        return html.renderScreenHTML();
     }
 
     private cars:Map<string,Car> = new Map<string, Car>();
