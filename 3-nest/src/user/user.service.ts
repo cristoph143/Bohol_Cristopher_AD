@@ -16,8 +16,9 @@ export class UserService {
         var message:string;
         var val:{};
 
-        for(const [key,user] of this.users.entries())
+        for(const [key,user] of this.users.entries()){
             chck = user.validationEmail(body.email);
+        }
         
         if(chck === true){
             newUser = new User(ID,body?.name,body?.age,body?.email,body?.password);
@@ -114,8 +115,11 @@ export class UserService {
         var message:string;
         var val:{};
 
-        for(const [key,user] of this.users.entries())
-            chck = user.validateID(id);
+        // for(const [key,user] of this.users.entries()){
+        //     chck = user.validateID(id);
+        // }
+
+        chck = this.searchID(id);
 
         if(chck === true){
             message = `Id ${id} is collected Successfully!`;
@@ -134,8 +138,7 @@ export class UserService {
         var message:string;
         var val:{};
 
-        for(const [key,user] of this.users.entries())
-            chck = user.validateID(id);
+        chck = this.searchID(id);
         
         if(chck === true){
             newUser = new User(id,body?.name,body?.age,body?.email,body?.password);
@@ -150,10 +153,37 @@ export class UserService {
         return val;
     }
 
+    replaceInfoByID2(id:string,body:any){
+    var chck:boolean;
+        let newUser:User;
+        var message:string;
+        var val:{};
+
+        chck = this.searchID(id);
+        
+        if(chck === true){
+            newUser = this.users.get(id);
+            newUser.modify(body);
+            
+            console.log("PAAAAAAAAAAAAAATCH ");
+            console.log(newUser.toJson());
+            // newUser = new User(id,body?.name,body?.age,body?.email,body?.password);
+            // this.users.set(id,newUser)
+            message = `Id ${id} is replaced successfully!`;
+            val = this.ret(message,chck);
+        }
+        else{
+            message = `Id ${id} has not been found in the database!`;
+            val = this.ret(message,chck);
+        }
+        return val;
+    }
+
     searchID(id:string){
         var chck:boolean;
-        for(const [key,user] of this.users.entries())
+        for(const [key,user] of this.users.entries()){
             chck = user.validateID(id);
+        }
         return chck;
     }
 
@@ -167,42 +197,42 @@ export class UserService {
         };
     }
 
-    updateProfile(id:string,body:any){
-        var chck:boolean;
-        var message = "";
-        let val:{};
-        console.log(Object.keys(body));
-        for(const [key,user] of this.users.entries())
-            chck = this.searchID(id);
+    // updateProfile(id:string,body:any){
+    //     var chck:boolean;
+    //     var message = "";
+    //     let val:{};
+    //     console.log(Object.keys(body));
+    //     for(const [key,user] of this.users.entries())
+    //         chck = this.searchID(id);
             
-        if(chck === true){
-            const attributeNames = ["name", "age","email","password"];
+    //     if(chck === true){
+    //         const attributeNames = ["name", "age","email","password"];
             
-            for(const key of Object.keys(body)){
-                console.log(`key${key}\nObject.key ${Object.keys(body)} ${body}`);
-                if(key in attributeNames){
+    //         for(const key of Object.keys(body)){
+    //             console.log(`key${key}\nObject.key ${Object.keys(body)} ${body}`);
+    //             if(key in attributeNames){
                     
-                }
-            }
-                this.users.set(id, body['key']);
-            //     if(key in attributeNames) {
-            //         this.users.set(id,newUser['key']);
-            //         console.log(this.users.set(id));
-            //         message = `Id ${id} is replaced successfully!`;
-            //         val = this.ret(message,chck);
-            //     }
-            //     else{
-            //         message = `Id ${id} has found ivalid data in the database!`;
-            //         val = this.ret(message,chck);
-            //     }
-            // }
-        }
-        else{
-            message = `Id ${id} has not been found in the database!`;
-            val = this.ret(message,chck);
-        }
-        return val;
-    }
+    //             }
+    //         }
+    //             this.users.set(id, body['key']);
+    //         //     if(key in attributeNames) {
+    //         //         this.users.set(id,newUser['key']);
+    //         //         console.log(this.users.set(id));
+    //         //         message = `Id ${id} is replaced successfully!`;
+    //         //         val = this.ret(message,chck);
+    //         //     }
+    //         //     else{
+    //         //         message = `Id ${id} has found ivalid data in the database!`;
+    //         //         val = this.ret(message,chck);
+    //         //     }
+    //         // }
+    //     }
+    //     else{
+    //         message = `Id ${id} has not been found in the database!`;
+    //         val = this.ret(message,chck);
+    //     }
+    //     return val;
+    // }
 
     deleteProfile(id:string){
         let message = "";
@@ -227,27 +257,43 @@ export class UserService {
     login(body:any){
         var chck:boolean;
         var message: string;
-        var suc:boolean;
         var val:{};
         for(const [key,user] of this.users.entries())
             chck = user.login(body.email,body.password);
         
         if(chck === true){
             message = "Login Successfully!";
-            
-            val = this.ret(message,suc);        
+            val = this.ret(message,chck);        
         }
         else{
             message = "Login Unsuccessfully!";
-            
-            val = this.ret(message,suc);
+            val = this.ret(message,chck);
         }
         return val;
     }
 
-    searchTerm(term:string){
+    searchTerm(term:any){
         var newUser:User;
         var chck:boolean;
+        var resultData = [];
+        var message:string;
+        var val:{};
+
+        for(const [key,user] of this.users.entries()){
+            if (user.retTermResult(term)){
+                resultData.push(user.toJson()); 
+                message = `${resultData.length} Data has been found!`;
+                val = this.ret(message,chck);
+            }
+        }
+
+        if (!resultData.length){
+            message = `${resultData.length} Data has not been found!`;
+            chck = false;
+            val = this.ret(message,chck);
+        }
+        resultData.unshift({keyword:term,result:resultData.length});//
+        return resultData;
 
 
         // for(const [key,user] of this.users.entries()){

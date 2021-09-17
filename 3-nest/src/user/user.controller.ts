@@ -83,9 +83,14 @@ export class UserController {
         > If the body has an invalid value return false or an error message.
         
     */
+    // @Patch("/:id")
+    // updateProfile(@Param('id') id:string,@Body() body:any){
+    //     return this.userService.updateProfile(id,body);
+    // }
+    
     @Patch("/:id")
-    updateProfile(@Param('id') id:string,@Body() body:any){
-        return this.userService.updateProfile(id,body);
+    replaceInfoByID2(@Param('id') id:string,@Body() body:any){
+        return this.userService.replaceInfoByID2(id,body);
     }
 
     /* 

@@ -30,6 +30,19 @@ export class User{
         }
     }
 
+    modify(body:any){
+        if(body.id != null)
+            this.id = body.id;
+        if(body.email != null)
+            this.email = body.email;
+        if(body.age != null)
+            this.age = body.age;
+        if(body.name != null)
+            this.name = body.name;
+        if(body.password != null)
+            this.password = body.password;
+    }
+
     validationEmail(email:string){
         if(email !== this.email){
             return true;
@@ -42,16 +55,29 @@ export class User{
     validateID(id:string){
         console.log(id);
         if(id === this.id){
+            console.log(id);
+            console.log(this.id);
             return true;
         }
         else{
+            console.log(id);
+            console.log(this.id);
             return false;
         }
     }
 
-    // retTermResult(term:string){
-        
-    // }
+    retTermResult(term:any){
+        var name: any[];
+        name = this.name.split(' ');
+        if(this.id === term || name[0].toString() === term || name[1] === term || this.name.toLowerCase() === term.toLowerCase()
+        ||  this.age === term || this.email.toLowerCase() === term.toLowerCase()){
+            console.log(`${this.name.split(' ')} split`);
+            return true;
+        } 
+        else{
+            return false;
+        }
+    }
 
 
 
