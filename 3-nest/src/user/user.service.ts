@@ -24,10 +24,12 @@ export class UserService {
             newUser = new User(ID,body?.name,body?.age,body?.email,body?.password);
             this.users.set(ID, newUser);
             message = `Id ${ID} of Email ${body.email} is registered successfully!`;
-            val = this.ret(message,chck);
+            val = newUser.ret(message,chck);
         }
         else{
-            message = `\tId ${ID} of Email ${body.email} is already registered!`;
+            newUser = this.users.get(body.id);
+            console.log(newUser);
+            message = `Id ${ID} of Email ${body.email} is already registered!`;
             val = this.ret(message,chck);
         }
         return val;
@@ -52,7 +54,6 @@ export class UserService {
             var email: string = this.email(name);
             console.log(pwd);
             this.users.set(ID,new User(ID,name,age,email,pwd));
-            // newUser = new User(ID,name,age,email,pwd);
         }
     }
 
@@ -99,14 +100,14 @@ export class UserService {
     }
     
     logAllUsers(){
-        console.log('----------------------------------------------------------------')
+        this.lines();
         console.log('User Credentials')
         for(const [key,user] of this.users.entries()){
             // console.log(`Key: ${key}`);
             // console.log(user.toJson());
             user.pri();
         }
-        console.log('----------------------------------------------------------------')
+        this.lines();
     }
 
     getID(id:string){
@@ -114,10 +115,6 @@ export class UserService {
         var newUser:User;
         var message:string;
         var val:{};
-
-        // for(const [key,user] of this.users.entries()){
-        //     chck = user.validateID(id);
-        // }
 
         chck = this.searchID(id);
 
@@ -167,8 +164,6 @@ export class UserService {
             
             console.log("PAAAAAAAAAAAAAATCH ");
             console.log(newUser.toJson());
-            // newUser = new User(id,body?.name,body?.age,body?.email,body?.password);
-            // this.users.set(id,newUser)
             message = `Id ${id} is replaced successfully!`;
             val = this.ret(message,chck);
         }
@@ -196,43 +191,6 @@ export class UserService {
             "message": message
         };
     }
-
-    // updateProfile(id:string,body:any){
-    //     var chck:boolean;
-    //     var message = "";
-    //     let val:{};
-    //     console.log(Object.keys(body));
-    //     for(const [key,user] of this.users.entries())
-    //         chck = this.searchID(id);
-            
-    //     if(chck === true){
-    //         const attributeNames = ["name", "age","email","password"];
-            
-    //         for(const key of Object.keys(body)){
-    //             console.log(`key${key}\nObject.key ${Object.keys(body)} ${body}`);
-    //             if(key in attributeNames){
-                    
-    //             }
-    //         }
-    //             this.users.set(id, body['key']);
-    //         //     if(key in attributeNames) {
-    //         //         this.users.set(id,newUser['key']);
-    //         //         console.log(this.users.set(id));
-    //         //         message = `Id ${id} is replaced successfully!`;
-    //         //         val = this.ret(message,chck);
-    //         //     }
-    //         //     else{
-    //         //         message = `Id ${id} has found ivalid data in the database!`;
-    //         //         val = this.ret(message,chck);
-    //         //     }
-    //         // }
-    //     }
-    //     else{
-    //         message = `Id ${id} has not been found in the database!`;
-    //         val = this.ret(message,chck);
-    //     }
-    //     return val;
-    // }
 
     deleteProfile(id:string){
         let message = "";

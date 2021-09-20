@@ -66,6 +66,21 @@ export class User{
         }
     }
 
+    lines(){
+        console.log('----------------------------------------------------------------\n')
+    }
+
+    ret(message:string,chck:boolean){
+        this.lines();
+        console.log(`\t${message}\n`);
+        this.pri();
+        this.lines();
+        return {
+            "success": chck,
+            "message": message
+        };
+    }
+
     retTermResult(term:any){
         var name: any[];
         name = this.name.split(' ');
