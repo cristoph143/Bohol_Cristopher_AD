@@ -120,7 +120,7 @@ export class UserService {
 
         if(chck === true){
             message = `Id ${id} is collected Successfully!`;
-            val = this.ret(message,chck);
+            val = newUser.ret(message,chck);
         }
         else{
             message = `Id ${id} is collected Unsuccessfully!`;
