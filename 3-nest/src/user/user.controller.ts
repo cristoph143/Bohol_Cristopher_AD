@@ -69,7 +69,7 @@ export class UserController {
     */
     @Put("/:id")
     replaceInfoByID(@Param('id') id:string, @Body() body:any){
-        return this.userService.replaceInfoByID(id,body);
+        return this.userService.replaceInfoByID2(id,body);
     }
 
 
