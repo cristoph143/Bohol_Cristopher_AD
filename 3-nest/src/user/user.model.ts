@@ -1,3 +1,6 @@
+import { CRUDReturn } from "./user.resource/crud_return.interface";
+import { Helper } from "./user.resource/helper";
+
 export class User{
     private id: string;
     private name: string;
@@ -13,12 +16,12 @@ export class User{
         this.password = password;
     }
 
-    get emails(){
-        return this.email;
-    }
-
-    set emails(email:string){
-        this.emails = email;
+    //Inspired by someone work char haha
+    systemMessage(sys_num:number,body:string){
+        switch(sys_num){
+            case 101: `Id ${body} is deleted successfully!`;
+            case 102: `Id ${body} is deleted successfully!`;
+        }
     }
 
     toJson(){
@@ -30,7 +33,7 @@ export class User{
         }
     }
 
-    modify(body:any){
+    modify(body:any):boolean{
         if(body.id != null)
             this.id = body.id;
         if(body.email != null)
@@ -41,10 +44,13 @@ export class User{
             this.name = body.name;
         if(body.password != null)
             this.password = body.password;
+        return true;
     }
 
+    //check if email not exist otherwise return false
     validationEmail(email:string){
         if(email !== this.email){
+            console.log(`${email} === ${this.email}`);
             return true;
         }
         else{
@@ -81,22 +87,22 @@ export class User{
         };
     }
 
-    retTermResult(term:any){
-        var name: any[];
-        name = this.name.split(' ');
-        if(this.id === term || name[0].toString() === term || name[1] === term || this.name.toLowerCase() === term.toLowerCase()
-        ||  this.age === term || this.email.toLowerCase() === term.toLowerCase()){
-            console.log(`${this.name.split(' ')} split`);
-            return true;
-        } 
-        else{
-            return false;
+    //FIXME: return
+    retTermResult(term:any):boolean{
+        var keys: Array<string> = Helper.describeClass(User);
+        console.log(`Zero: ${keys} keys ${keys}\n`);
+        keys = Helper.removeItemOnce(keys,'password');
+        console.log(`One: ${keys} keys ${keys}\n`);
+        for(const key of keys){
+            console.log(`Two: ${key} keys ${keys}\n`);
+            if(`${this[key]}` === term) return true;
+            console.log(`Three: ${key} keys ${keys}\n`);
         }
+        return false;
     }
 
-
-
     login(email:string, password:string){
+        
         if(email === this.email && password === this.password){
             return true;
         }
