@@ -1,275 +1,386 @@
 import { Injectable } from '@nestjs/common';
 import { User } from './user.model';
+import { CRUDReturn } from './user.resource/crud_return.interface';
+import { Helper } from './user.resource/helper';
 
 @Injectable()
 export class UserService {
     private users: Map<string,User> = new Map<string,User>();
 
     constructor(){
+        // Helper.populate();
         this.populate();
     }
-
-    register(body: any) {
-    var newUser:User;
-        var ID:string = this.ids();
+    
+    /* 
+        TODO:
+            > Creates a user and saves it to the database
+        FIXME:
+            > has attibutes of wrong type
+            > missing an attribute
+            > invalid attribute Key
+            > Email ALready exists in database
+    */
+    register(body: any):CRUDReturn {
         var chck:boolean;
-        var message:string;
-        var val:{};
+        try{
+            var validBody: {
+                valid: boolean;
+                data: string
+            } = Helper.validBody(body);
 
-        for(const [key,user] of this.users.entries()){
-            chck = user.validationEmail(body.email);
+            if(validBody.valid){
+                for(const user of this.users.values()){
+                    chck = user.validationEmail(body.email);
+                }
+                console.log(chck);
+                if(chck){
+                    var ID:string = body?.id; 
+                    var newUser:User = new User(
+                        ID,
+                        body?.name,
+                        body?.age,
+                        body?.email,
+                        body?.password);
+                        console.log(this.saveToDataBase(newUser,ID));
+                    console.log(ID);
+                    if(this.saveToDataBase(newUser,ID)){
+                            console.log('nisud?')
+                            var resultData:Array<any> = [];
+                            for(const user of this.users.values()){
+                                if (user.validateID(ID)){
+                                    resultData.push(user.toJson()); 
+                                    console.log('sss');
+                                }
+                            }
+                            return {
+                                success: resultData.length > 0, 
+                                data: resultData
+                            };
+                    }
+                    else{
+                        console.log('1 ' + body.id);
+                        throw new Error(`Failed to update user in database`);
+                    }
+                }
+                else{
+                    throw new Error(`${body.email} is already in use by another user!)`);
+                }
+            }
+            else{
+                throw new Error(validBody.data);
+            }
+        }catch(error){
+            console.log(error.message + ' h');
+            return {
+                success: false, data: `Error adding account, ${error.message}`
+            };
         }
-        
-        if(chck === true){
-            newUser = new User(ID,body?.name,body?.age,body?.email,body?.password);
-            this.users.set(ID, newUser);
-            message = `Id ${ID} of Email ${body.email} is registered successfully!`;
-            val = newUser.ret(message,chck);
-        }
-        else{
-            newUser = this.users.get(body.id);
-            console.log(newUser);
-            message = `Id ${ID} of Email ${body.email} is already registered!`;
-            val = this.ret(message,chck);
-        }
-        return val;
     }
 
-    getAll(){
-        var newUser:User;
-        var populatedData = [];
+
+    saveToDataBase(body: any, ID:string): boolean{
+        try{
+            this.users.set(body.user,body);
+            console.log(body.id +' 4');
+            var chck = this.searchID(body.id);
+            return chck;
+        }
+        catch(error){
+            console.log(error)
+            return false;
+        }
+    }
+
+    /*
+        TODO:
+            > retrieves all uses data of all users || empty array
+    */
+    getAll():CRUDReturn{
+        var populatedData: Array<any> = [];
         for(const user of this.users.values())
             populatedData.push(user.toJson());
         this.logAllUsers();
-        return populatedData;
+        return {success: populatedData.length > 0, data: populatedData};
     }
 
     populate(){
         var newUser:User;
         for(var i = 1; i < 4; i++){
-            var ID:string = this.ids();
-            var name:string = this.name();
-            var pwd: string = this.pwd();
-            var age: number = this.age();
-            var email: string = this.email(name);
+            var ID:string = Helper.generateUID();
+            var name:string = Helper.full_name();
+            var pwd: string = Helper.pwd();
+            var age: number = Helper.age();
+            var email: string = Helper.email(name);
             console.log(pwd);
             this.users.set(ID,new User(ID,name,age,email,pwd));
         }
-    }
-
-    ids() {
-        // Math.random should be unique because of its seeding algorithm.
-        // Convert it to base 36 (numbers + letters), and grab the first 9 characters
-        // after the decimal.
-        return '@' + Math.random().toString(36).substr(2, 9);
-    };
-
-    name(){
-        const fName = ['John', 'Doe', 'Mary', 'Charles', 'Jaime'];
-        const lName = ['Fernandez', 'Valdez', 'Montecarlos','Villanueva', 'Villegas'];
-        var randF:number=Math.floor(Math.random() * fName.length);
-        var randL:number=Math.floor(Math.random() * lName.length);
-        var newName = fName[randF] + ' ' + lName[randL];
-        return newName;
-    }
-    
-    email(name:string){
-        var ext1 = ['gmail', 'yahoo', 'usjr', 'email'];
-        var ext2 = ['com', 'ph'];
-        var newName = name.replace(/ /, '_');
-        var rand1:number = Math.floor(Math.random() * ext1.length);
-        var rand2:number = Math.floor(Math.random() * ext2.length);
-        var ext:string = ext1[rand1] + '.' + ext2[rand2];
-        var email = newName + '@' + ext;
-        return email;
-    }
-
-    pwd(){
-        var length = 8,
-        charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
-        retVal = "";
-    for (var i = 0, n = charset.length; i < length; ++i) {
-        retVal += charset.charAt(Math.floor(Math.random() * n));
-    }
-    return retVal;
-
-    }
-
-    age(){
-        return Math.floor(Math.random() * 40) + 15;
     }
     
     logAllUsers(){
         this.lines();
         console.log('User Credentials')
         for(const [key,user] of this.users.entries()){
-            // console.log(`Key: ${key}`);
-            // console.log(user.toJson());
             user.pri();
         }
         this.lines();
     }
 
+    /*
+        TODO: 
+            > retrieves user's data
+        FIXME:
+            > fails if parameter id does not match any users in database
+    */
     getID(id:string){
         var chck:boolean;
-        var newUser:User;
-        var message:string;
-        var val:{};
+        var resultData:Array<any> = [];
+        try{
+            chck = this.searchID(id);
 
-        chck = this.searchID(id);
-
-        if(chck === true){
-            message = `Id ${id} is collected Successfully!`;
-            val = newUser.ret(message,chck);
+            if(chck === true){
+                // for(const user of this.users.values()){
+                //     if ())){
+                //         resultData.push(user.toJson()); 
+                //     }
+                // }
+                // if(resultData.length > 0){
+                    return {
+                            success: chck,
+                            data: this.users.get(id).toJson()
+                    };
+                // }
+                // else{
+                //     throw new Error(`${body.email} login fail, Email does not match with the password`);
+                // }
+            }
+            else{
+                return {
+                    success: chck, 
+                    data: `User ${id} has not been found in the database!`};
+            }
+        
+        }catch(error){
+            return {
+                success: false,
+                data: error.message
+            };  
         }
-        else{
-            message = `Id ${id} is collected Unsuccessfully!`;
-            val = this.ret(message,chck);
-        }
-        return val;
     }
 
+    /*
+        TODO: does not replace the generated 
+        FIXME: 
+            > has attribute of the wrong type,
+            > has invalid attribute key,
+            > missing an attributes
+            > an email already exist in database that is not the current user
+    */
     replaceInfoByID(id:string,body:any){
         var chck:boolean;
         let newUser:User;
-        var message:string;
-        var val:{};
-
-        chck = this.searchID(id);
+        try{
+            chck = this.searchID(id);
         
-        if(chck === true){
-            newUser = new User(id,body?.name,body?.age,body?.email,body?.password);
-            this.users.set(id,newUser)
-            message = `Id ${id} is replaced successfully!`;
-            val = this.ret(message,chck);
+            if(chck === true){
+                var validBodyPut: {
+                    valid: boolean;
+                    data: string
+                } = Helper.validBodyPut(body);
+                if(validBodyPut.valid){
+                    for(const user of this.users.values()){
+                        chck = user.validationEmail(body.email);
+                    }
+                    if(chck){
+                        var user: User = this.users.get(id);
+                        var success = user.modify(body);
+                        if(success){
+                            return {
+                                success: success,
+                                data: user.toJson()
+                            };
+                        }
+                        else{
+                            throw new Error(`Failed to update user in database`);
+                        }
+                    }
+                    else{
+                        throw new Error(`${body.email} is already in use by another user!)`);
+                    }
+                }
+                else{
+                    throw new Error(validBodyPut.data);
+                }
+            }
+            else{
+                throw new Error(`User ${id} is not in the database`);
+            }
+        }catch(error){
+            return { 
+                success: false, 
+                data: error.message
+            }
         }
-        else{
-            message = `Id ${id} has not been found in the database!`;
-            val = this.ret(message,chck);
-        }
-        return val;
     }
 
+    
+    /*
+        TODO: does not replace the generate id
+        FIXME: fails if the payload
+            > has attributes of the wrong types
+            > has an invalid attribute key
+            > an email already exists in the databsae that is not the current user
+    */
     replaceInfoByID2(id:string,body:any){
-    var chck:boolean;
+        var chck:boolean;
         let newUser:User;
-        var message:string;
-        var val:{};
-
-        chck = this.searchID(id);
+        try{
+            chck = this.searchID(id);
         
-        if(chck === true){
-            newUser = this.users.get(id);
-            newUser.modify(body);
-            
-            console.log("PAAAAAAAAAAAAAATCH ");
-            console.log(newUser.toJson());
-            message = `Id ${id} is replaced successfully!`;
-            val = this.ret(message,chck);
+            if(chck === true){
+                var validBodyPatch: {
+                    valid: boolean;
+                    data: string
+                } = Helper.validBodyPatch(body);
+                if(validBodyPatch.valid){
+                    for(const user of this.users.values()){
+                        chck = user.validationEmail(body.email);
+                    }
+                    if(chck){
+                        var user: User = this.users.get(id);
+                        var success = user.modify(body);
+                        if(success){
+                            return {
+                                success: success,
+                                data: user.toJson()
+                            };
+                        }
+                        else{
+                            throw new Error(`Failed to update user in database`);
+                        }
+                    }
+                    else{
+                        throw new Error(`${body.email} is already in use by another user!)`);
+                    }
+                }
+                else{
+                    throw new Error(validBodyPatch.data);
+                }
+            }
+            else{
+                throw new Error(`User ${id} is not in the database`);
+            }
+        }catch(error){
+            return { 
+                success: false, 
+                data: error.message
+            }
         }
-        else{
-            message = `Id ${id} has not been found in the database!`;
-            val = this.ret(message,chck);
-        }
-        return val;
     }
 
     searchID(id:string){
         var chck:boolean;
         for(const [key,user] of this.users.entries()){
             chck = user.validateID(id);
+            if(chck === true) break;
         }
         return chck;
     }
 
-    ret(message:string,chck:boolean){
-        this.lines();
-        console.log(`\t${message}\n`);
-        this.lines();
-        return {
-            "success": chck,
-            "message": message
-        };
-    }
 
-    deleteProfile(id:string){
-        let message = "";
-        let chck = this.searchID(id);
-        var val:{};
-        if(chck === true){
-            this.users.delete(id);
-            message = `Id ${id} is deleted successfully!`;
-            val = this.ret(message,chck);
+    /*
+        TODO: does not replace the generate id
+        FIXME: fails is the payload
+            > has attributes of the wrong types
+            > has an invalid attribute key
+            > an email already exists in the databsae that is not the current user
+    */
+    deleteProfile(id:string):CRUDReturn{
+        try{
+            let chck = this.searchID(id);
+            if(chck === true){
+                return {
+                    success: this.users.delete(id),
+                    data: `User ${id} has been deleted successfully`
+                }; 
+            }
+            else{
+                return {
+                    success: chck,
+                    data: `Id ${id} has not been found in the database!`
+                };
+            }
+        }catch(error){
+            return {
+                    success: false,
+                    data: error.message
+            };  
         }
-        else{
-            message = `Id ${id} has not been found in the database!`;
-            val = this.ret(message,chck);
-        }
-        return val;
     }
 
     lines(){
         console.log('----------------------------------------------------------------\n')
+
     }
 
-    login(body:any){
+    login(body:any):CRUDReturn{
         var chck:boolean;
-        var message: string;
-        var val:{};
-        for(const [key,user] of this.users.entries())
-            chck = user.login(body.email,body.password);
-        
-        if(chck === true){
-            message = "Login Successfully!";
-            val = this.ret(message,chck);        
+        var resultData:Array<any> = [];
+        try{
+            var validBody: {
+                valid: boolean;
+                data: string
+            } = Helper.validBody(body);
+            if(validBody.valid){
+                for(const [key,user] of this.users.entries()){
+                    chck = user.validationEmail(body.email);
+                }//if it is not exist, true will be false
+                if(!chck){//if exist, false will be true
+                    for(const user of this.users.values()){
+                        if (user.login(body.email,body.password)){
+                            resultData.push(user.toJson()); 
+                        }
+                    }
+                    if(resultData.length > 0){
+                        return {
+                                success: resultData.length > 0, 
+                                data: resultData
+                        };
+                    }
+                    else{
+                        throw new Error(`${body.email} login fail, Email does not match with the password`);
+                    }
+                }
+                else{
+                    throw new Error(`${body.email} login fail, Email does not exist in the database!`);
+                }
+            }
+            else{
+                throw new Error(validBody.data);
+            }
+        }catch(error){
+            return {
+                success: false,
+                data: error.message
+            };  
         }
-        else{
-            message = "Login Unsuccessfully!";
-            val = this.ret(message,chck);
-        }
-        return val;
     }
 
-    searchTerm(term:any){
-        var newUser:User;
-        var chck:boolean;
-        var resultData = [];
-        var message:string;
-        var val:{};
+    /*
+        TODO: retrieves a user's data
+        FIXME: Fails if the parameter id does not match any users in the database
+    */
+    searchTerm(term:any):CRUDReturn{
+        var resultData:Array<any> = [];
 
-        for(const [key,user] of this.users.entries()){
+        for(const user of this.users.values()){
             if (user.retTermResult(term)){
                 resultData.push(user.toJson()); 
-                message = `${resultData.length} Data has been found!`;
-                val = this.ret(message,chck);
             }
         }
-
-        if (!resultData.length){
-            message = `${resultData.length} Data has not been found!`;
-            chck = false;
-            val = this.ret(message,chck);
-        }
-        resultData.unshift({keyword:term,result:resultData.length});//
-        return resultData;
-
-
-        // for(const [key,user] of this.users.entries()){
-        //     const filteredTermss = this.users.
-        //     })
-        // }
-        // for(const [key,user] of this.users.entries()){
-        //     if(this.users.has(term)){
-        //         console.log(`\t${term} is now Collected!`);
-        //         console.log(`\tKey: ${key}`);
-        //         console.log(`\t${user}`);
-        //             console.log(`\n----------------------------------------------------------------`);
-        //             break;
-        //     }
-        //     else{ 
-        //         console.log(`\t${term} does not exist in the database!`);
-        //             console.log(`\n----------------------------------------------------------------`);
-        //     }
-        // }
+        return {
+            success: resultData.length > 0, 
+            data: resultData
+        };
     }
 }
