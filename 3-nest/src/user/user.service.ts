@@ -8,7 +8,7 @@ export class UserService {
     private users: Map<string,User> = new Map<string,User>();
 
     constructor(){
-        // Helper.populate();
+        // this. = Helper.populate();
         this.populate();
     }
     
@@ -27,15 +27,16 @@ export class UserService {
             var validBody: {
                 valid: boolean;
                 data: string
-            } = Helper.validBody(body);
+            } = Helper.validBodyPut(body);
 
             if(validBody.valid){
                 for(const user of this.users.values()){
                     chck = user.validationEmail(body.email);
+                    if(chck === false) break;
                 }
                 console.log(chck);
-                if(chck){
-                    var ID:string = body?.id; 
+                if(chck === true){
+                    var ID:string = Helper.generateUID(); 
                     var newUser:User = new User(
                         ID,
                         body?.name,
@@ -104,18 +105,33 @@ export class UserService {
         return {success: populatedData.length > 0, data: populatedData};
     }
 
+
+
     populate(){
-        var newUser:User;
-        for(var i = 1; i < 4; i++){
-            var ID:string = Helper.generateUID();
-            var name:string = Helper.full_name();
-            var pwd: string = Helper.pwd();
-            var age: number = Helper.age();
-            var email: string = Helper.email(name);
-            console.log(pwd);
-            this.users.set(ID,new User(ID,name,age,email,pwd));
-        }
+        var id:string = Helper.generateUID();
+        this.users.set(id,new User(id,'Leanne Graham', 18, 'sincere@april.biz', 'LG_123456'));
+        id = Helper.generateUID();
+        this.users.set(id,new User(id,'Nathan Plains', 25, 'nathan@yesenia.net', 'NP_812415'));
+        id = Helper.generateUID();
+        this.users.set(id,new User(id,'Ervin Howell', 21, 'shanna@melissa.tv', 'EH_123123'));
+        id = Helper.generateUID();
+        this.users.set(id,new User(id,'Patricia Lebsack', 18, 'patty@kory.org', 'PL_12345'));
     }
+
+
+
+    // populate(){
+    //     var newUser:User;
+    //     for(var i = 1; i < 5; i++){
+    //         var ID:string = Helper.generateUID();
+    //         var name:string = Helper.full_name();
+    //         var pwd: string = Helper.pwd();
+    //         var age: number = Helper.age();
+    //         var email: string = Helper.email(name);
+    //         console.log(pwd);
+    //         this.users.set(ID,new User(ID,name,age,email,pwd));
+    //     }
+    // }
     
     logAllUsers(){
         this.lines();
@@ -334,8 +350,9 @@ export class UserService {
             if(validBody.valid){
                 for(const [key,user] of this.users.entries()){
                     chck = user.validationEmail(body.email);
-                }//if it is not exist, true will be false
-                if(!chck){//if exist, false will be true
+                    if(chck === false) break;
+                }
+                if(chck === false){
                     for(const user of this.users.values()){
                         if (user.login(body.email,body.password)){
                             resultData.push(user.toJson()); 

@@ -32,6 +32,14 @@ export class User{
             email: this.email
         }
     }
+    toJson2(){
+        return {
+            id: this.id,
+            name:this.name,
+            age: this.age,
+            email: this.email
+        }
+    }
 
     modify(body:any):boolean{
         if(body.id != null)
@@ -50,10 +58,12 @@ export class User{
     //check if email not exist otherwise return false
     validationEmail(email:string){
         if(email !== this.email){
-            console.log(`${email} === ${this.email}`);
+            console.log(`${email} === ${this.email} not exist`);
             return true;
         }
         else{
+            
+            console.log(`${email} === ${this.email} exist`);
             return false;
         }
     }
