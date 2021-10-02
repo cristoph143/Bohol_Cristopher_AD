@@ -141,22 +141,5 @@ export class Helper {
         return { valid: false, data: error.message };
         }
     }
-    static validBodyPatch(body: any): { valid: boolean; data: string } {
-        try {
-        var bodyValidation: { valid: boolean; data: string } =
-            this.validBody(body);
-        if (bodyValidation.valid) {
-            var keys: Array<string> = Helper.describeClass(User);
-            keys = Helper.removeItemOnce(keys, "id");
-            for (const key of Object.keys(body)) {
-            if (keys.includes(`${key}`)) {
-                keys = Helper.removeItemOnce(keys, key);
-            }
-            }
-            return { valid: true, data: null };
-        } else throw Error(bodyValidation.data);
-        } catch (error) {
-        return { valid: false, data: error.message };
-        }
-    }
+    
 }

@@ -148,34 +148,24 @@ export class UserService {
         FIXME:
             > fails if parameter id does not match any users in database
     */
-    getID(id:string){
+    getID(id:string):CRUDReturn{
         var chck:boolean;
         var resultData:Array<any> = [];
         try{
             chck = this.searchID(id);
-
+            console.log('ID: id ' + id + ' Check')
             if(chck === true){
-                // for(const user of this.users.values()){
-                //     if ())){
-                //         resultData.push(user.toJson()); 
-                //     }
-                // }
-                // if(resultData.length > 0){
-                    return {
+                return {
                             success: chck,
                             data: this.users.get(id).toJson()
-                    };
-                // }
-                // else{
-                //     throw new Error(`${body.email} login fail, Email does not match with the password`);
-                // }
+                };
             }
             else{
                 return {
                     success: chck, 
-                    data: `User ${id} has not been found in the database!`};
+                    data: `User ${id} lol has not been found in the database!`
+                };
             }
-        
         }catch(error){
             return {
                 success: false,
@@ -192,7 +182,7 @@ export class UserService {
             > missing an attributes
             > an email already exist in database that is not the current user
     */
-    replaceInfoByID(id:string,body:any){
+    replaceInfoByID(id:string,body:any):CRUDReturn{
         var chck:boolean;
         let newUser:User;
         try{
@@ -247,18 +237,18 @@ export class UserService {
             > has an invalid attribute key
             > an email already exists in the databsae that is not the current user
     */
-    replaceInfoByID2(id:string,body:any){
+    replaceInfoByID2(id:string,body:any):CRUDReturn{
         var chck:boolean;
         let newUser:User;
         try{
             chck = this.searchID(id);
         
             if(chck === true){
-                var validBodyPatch: {
+                var validBody: {
                     valid: boolean;
                     data: string
-                } = Helper.validBodyPatch(body);
-                if(validBodyPatch.valid){
+                } = Helper.validBody(body);
+                if(validBody.valid){
                     for(const user of this.users.values()){
                         chck = user.validationEmail(body.email);
                     }
@@ -276,11 +266,11 @@ export class UserService {
                         }
                     }
                     else{
-                        throw new Error(`${body.email} is already in use by another user!)`);
+                        throw new Error(`${body.email} is already in use by another user!`);
                     }
                 }
                 else{
-                    throw new Error(validBodyPatch.data);
+                    throw new Error(validBody.data);
                 }
             }
             else{
@@ -298,7 +288,10 @@ export class UserService {
         var chck:boolean;
         for(const [key,user] of this.users.entries()){
             chck = user.validateID(id);
-            if(chck === true) break;
+            if(chck === true) {
+                console.log(`Break : ${chck}`)
+                break;
+            }
         }
         return chck;
     }
@@ -353,9 +346,13 @@ export class UserService {
                     if(chck === false) break;
                 }
                 if(chck === false){
-                    for(const user of this.users.values()){
+                    for(const [key,user] of this.users.entries()){
                         if (user.login(body.email,body.password)){
-                            resultData.push(user.toJson()); 
+                            console.log(`Email: ${user['email']} Password: ${user['password']} `)
+                            const email:string = user['email'];
+                            const password:string = user['password'];
+                            
+                            resultData.push({"email":email,"password":password});
                         }
                     }
                     if(resultData.length > 0){
