@@ -34,10 +34,8 @@ export class User{
     }
     toJson2(){
         return {
-            id: this.id,
-            name:this.name,
-            age: this.age,
-            email: this.email
+            email: this.email,
+            password: this.password
         }
     }
 
@@ -69,15 +67,12 @@ export class User{
     }
 
     validateID(id:string){
-        console.log(id);
         if(id === this.id){
-            console.log(id);
-            console.log(this.id);
+            console.log(`ID: ${id} === This.id: ${this.id} ??? Equal`);
             return true;
         }
         else{
-            console.log(id);
-            console.log(this.id);
+            console.log(`ID: ${id} === This.id: ${this.id} ??? Not Equal`);
             return false;
         }
     }
