@@ -43,19 +43,23 @@ export class UserService {
                         body?.age,
                         body?.email,
                         body?.password);
-                        console.log(this.saveToDataBase(newUser,ID));
-                    console.log(ID);
+                        console.log("ID: " + ID);
                     if(this.saveToDataBase(newUser,ID)){
                             console.log('nisud?')
                             var resultData:Array<any> = [];
                             for(const user of this.users.values()){
                                 if (user.validateID(ID)){
-                                    resultData.push(user.toJson()); 
+                                    const name:string = user['name'];
+                                    const age:number = user['age'];
+                                    const email:string = user['email'];
+                                    const password:string = user['password'];
+                            
+                                    console.log(resultData.push({"name":name,"age":age,"email":email,"password":password}));
                                     console.log('sss');
                                 }
                             }
                             return {
-                                success: resultData.length > 0, 
+                                success: true, 
                                 data: resultData
                             };
                     }
@@ -65,10 +69,11 @@ export class UserService {
                     }
                 }
                 else{
-                    throw new Error(`${body.email} is already in use by another user!)`);
+                    throw new Error(`${body.email} is already in use by another user!`);
                 }
             }
             else{
+                console.log('Hello')
                 throw new Error(validBody.data);
             }
         }catch(error){
@@ -85,6 +90,7 @@ export class UserService {
             this.users.set(body.user,body);
             console.log(body.id +' 4');
             var chck = this.searchID(body.id);
+            console.log('Save to db: chck' + chck)
             return chck;
         }
         catch(error){
@@ -155,16 +161,24 @@ export class UserService {
             chck = this.searchID(id);
             console.log('ID: id ' + id + ' Check')
             if(chck === true){
+                console.log('t')
                 return {
-                            success: chck,
-                            data: this.users.get(id).toJson()
+                    success: chck,
+                    data: this.users.get(id).toJson()
                 };
             }
             else{
-                return {
-                    success: chck, 
-                    data: `User ${id} lol has not been found in the database!`
-                };
+                console.log('f')
+                // const data_error ={
+                //     success: false,
+                //     data: mes
+                // }
+                // const {success,data} = data_error;
+                // return {
+                //     success: false, 
+                //     data: "Error"
+                // };
+                throw new Error("Error");
             }
         }catch(error){
             return {
@@ -285,15 +299,25 @@ export class UserService {
     }
 
     searchID(id:string){
+        try{
         var chck:boolean;
-        for(const [key,user] of this.users.entries()){
-            chck = user.validateID(id);
-            if(chck === true) {
-                console.log(`Break : ${chck}`)
-                break;
+        console.log(id.length)
+        if(id.length === 28){
+            for(const [key,user] of this.users.entries()){
+                chck = user.validateID(id);
+                if(chck === true) {
+                    console.log(`Break : ${chck}`)
+                    break;
+                }
             }
+            return chck;
         }
-        return chck;
+        else{
+            throw new Error(`Id ${id} has not been found in the database!`)
+        }
+        }catch(error){
+            return chck;
+        }
     }
 
 
@@ -308,6 +332,7 @@ export class UserService {
         try{
             let chck = this.searchID(id);
             if(chck === true){
+                this.users.delete(id);
                 return {
                     success: this.users.delete(id),
                     data: `User ${id} has been deleted successfully`
@@ -315,7 +340,7 @@ export class UserService {
             }
             else{
                 return {
-                    success: chck,
+                    success: false,
                     data: `Id ${id} has not been found in the database!`
                 };
             }
@@ -348,11 +373,12 @@ export class UserService {
                 if(chck === false){
                     for(const [key,user] of this.users.entries()){
                         if (user.login(body.email,body.password)){
-                            console.log(`Email: ${user['email']} Password: ${user['password']} `)
-                            const email:string = user['email'];
-                            const password:string = user['password'];
+                            // console.log(`Email: ${user['email']} Password: ${user['password']} `)
+                            // const email:string = user['email'];
+                            // const password:string = user['password'];
                             
-                            resultData.push({"email":email,"password":password});
+                            // resultData.push({"email":email,"password":password});
+                            resultData.push(user.toJson());
                         }
                     }
                     if(resultData.length > 0){
@@ -370,9 +396,11 @@ export class UserService {
                 }
             }
             else{
+                console.log('Hello There')
                 throw new Error(validBody.data);
             }
         }catch(error){
+            console.log('hi there')
             return {
                 success: false,
                 data: error.message
