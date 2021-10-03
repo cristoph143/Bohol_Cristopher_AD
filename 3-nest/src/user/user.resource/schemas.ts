@@ -20,10 +20,10 @@ interface of CRUDReturn
 }
 USER_DATA
 {
-      id: string
-      name: string,
-      age: number,
-      email: string
+    id: string
+    name: string,
+    age: number,
+    email: string
 }
 LOGIN_SCHEMA
 {
