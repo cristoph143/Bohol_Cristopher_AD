@@ -157,8 +157,8 @@ export class UserService {
     getID(id: string): CRUDReturn {
         var chck: boolean;
 
-        chck = this.users.has(id);
-        console.log('ID: id ' + id + ' Check')
+        chck = this.searchID(id);
+        console.log('ID: id ' + id + ' Check ' + chck)
         if (chck === true) {
             console.log('t')
             return {
@@ -168,7 +168,7 @@ export class UserService {
         }
         else{
             return {
-                success: chck,
+                success: false,
                 data: `User ${id} is not in database`,
             };
         }
