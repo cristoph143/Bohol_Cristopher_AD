@@ -9,7 +9,7 @@ export class Helper {
     }
 
     static generateUID(): string {
-        return '@' + uid().toString().replace(/-/g, '').substring(0, 27);
+        return uid().toString().replace(/-/g, '').substring(0, 27);
     }
 
     static full_name():string {
