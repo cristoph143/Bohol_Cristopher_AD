@@ -46,15 +46,18 @@ export class UserService {
                         console.log("ID: " + ID);
                     if(this.saveToDataBase(newUser,ID)){
                             console.log('nisud?')
-                            var resultData:Array<any> = [];
+                            var resultData:{};
                             for(const user of this.users.values()){
                                 if (user.validateID(ID)){
                                     const name:string = user['name'];
                                     const age:number = user['age'];
                                     const email:string = user['email'];
-                                    const password:string = user['password'];
                             
-                                    console.log(resultData.push({"name":name,"age":age,"email":email,"password":password}));
+                                    // console.log(resultData.push({"name":name,"age":age,"email":email,"password":password}));
+                                    // resultData.push(user.toJson());
+                                    resultData = {
+                                        ID,name,age,email
+                                    };
                                     console.log('sss');
                                 }
                             }
@@ -160,7 +163,7 @@ export class UserService {
         try{
             chck = this.searchID(id);
             console.log('ID: id ' + id + ' Check')
-            if(chck === true){
+            if(this.users.has(id)){
                 console.log('t')
                 return {
                     success: chck,
@@ -178,12 +181,12 @@ export class UserService {
                 //     success: false, 
                 //     data: "Error"
                 // };
-                throw new Error("Error");
+                throw new Error(`User ${id} is not in database`);
             }
         }catch(error){
             return {
                 success: false,
-                data: error.message
+                data: error.message,
             };  
         }
     }
@@ -302,7 +305,7 @@ export class UserService {
         try{
         var chck:boolean;
         console.log(id.length)
-        if(id.length === 28){
+        if(id.length === 27){
             for(const [key,user] of this.users.entries()){
                 chck = user.validateID(id);
                 if(chck === true) {
@@ -359,7 +362,7 @@ export class UserService {
 
     login(body:any):CRUDReturn{
         var chck:boolean;
-        var resultData:Array<any> = [];
+        var resultData:{};
         try{
             var validBody: {
                 valid: boolean;
@@ -373,17 +376,19 @@ export class UserService {
                 if(chck === false){
                     for(const [key,user] of this.users.entries()){
                         if (user.login(body.email,body.password)){
-                            // console.log(`Email: ${user['email']} Password: ${user['password']} `)
-                            // const email:string = user['email'];
-                            // const password:string = user['password'];
-                            
-                            // resultData.push({"email":email,"password":password});
-                            resultData.push(user.toJson());
+                            const ID:string = user['id']
+                            const name:string = user['name'];
+                            const age:number = user['age'];
+                            const email:string = user['email'];
+                            resultData = {
+                                        ID,name,age,email
+                            };
+                            chck = true;
                         }
                     }
-                    if(resultData.length > 0){
+                    if(chck === true){
                         return {
-                                success: resultData.length > 0, 
+                                success: chck, 
                                 data: resultData
                         };
                     }

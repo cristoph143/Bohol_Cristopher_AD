@@ -15,31 +15,39 @@ export class User {
     this.password = password;
   }
 
-//   login(password: string): CRUDReturn {
-//     try {
-//       if (this.password === password) {
-//         return { success: true, data: this.toJson() };
-//       } else {
-//         throw new Error(`${this.email} login fail, password does not match`);
-//       }
-//     } catch (error) {
-//       return { success: false, data: error.message };
-//     }
-//   }
+  matches(term: string): boolean {
+    var keys: Array<string> = Helper.describeClass(User);
+    keys = Helper.removeItemOnce(keys, 'password');
+    for (const key of keys) {
+      if (`${this[key]}` === term) return true;
+    }
+    return false;
+  }
 
-//    matches(term: string): boolean {
-//    //hehe you didn't think I would actually give you the answers, yes?
-//   }
+  replaceValues(body: any): boolean {
+    try {
+      var keys: Array<string> = Helper.describeClass(User);
+      keys = Helper.removeItemOnce(keys, 'id');
+      for (const key of Object.keys(body)) {
+        this[key] = body[key];
+      }
+      return true;
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
+  }
 
-//   replaceValues(body: any): boolean {
-//    //hehe you didn't think I would actually give you the answers, yes?
-//   }
+  log() {
+    console.log(this.toJson());
+  }
 
-//   log() {
-//     console.log(this.toJson());
-//   }
-
-//   toJson() {    
-//    //hehe you didn't think I would actually give you the answers, yes?
-//   }
+  toJson() {
+    return {
+      id: this.id,
+      name: this.name,
+      age: this.age,
+      email: this.email,
+    };
+  }
 }
