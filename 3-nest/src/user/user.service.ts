@@ -36,24 +36,24 @@ export class UserService {
                 }
                 console.log(chck);
                 if (chck === true) {
-                    var ID: string = Helper.generateUID();
+                    var id: string = Helper.generateUID();
                     var newUser: User = new User(
-                        ID,
+                        id,
                         body?.name,
                         body?.age,
                         body?.email,
                         body?.password);
-                    console.log("ID: " + ID);
-                    if (this.saveToDataBase(newUser, ID)) {
+                    console.log("id: " + id);
+                    if (this.saveToDataBase(newUser, id)) {
                         console.log('nisud?')
                         var resultData: {};
                         for (const user of this.users.values()) {
-                            if (user.validateID(ID)) {
+                            if (user.validateID(id)) {
                                 const name: string = user['name'];
                                 const age: number = user['age'];
                                 const email: string = user['email'];
                                 resultData = {
-                                    ID, name, age, email
+                                    id, name, age, email
                                 };
                                 console.log('sss');
                             }
@@ -85,11 +85,11 @@ export class UserService {
     }
 
 
-    saveToDataBase(body: any, ID: string): boolean {
+    saveToDataBase(body: any, id: string): boolean {
         try {
-            this.users.set(body.user, body);
+            this.users.set(body.id, body);
             console.log(body.id + ' 4');
-            var chck = this.searchID(body.id);
+            var chck = this.users.has(id);
             console.log('Save to db: chck' + chck)
             return chck;
         }
@@ -166,13 +166,13 @@ export class UserService {
                 data: this.users.get(id).toJson()
             };
         }
-        else{
+        else {
             return {
                 success: false,
                 data: `User ${id} is not in database`,
             };
         }
-            
+
     }
 
     /*
@@ -197,8 +197,9 @@ export class UserService {
                 if (validBodyPut.valid) {
                     for (const user of this.users.values()) {
                         chck = user.validationEmail(body.email);
+                        if(chck === false) break;
                     }
-                    if (chck) {
+                    if (chck === true) {
                         var user: User = this.users.get(id);
                         var success = user.modify(body);
                         if (success) {
@@ -252,8 +253,9 @@ export class UserService {
                 if (validBody.valid) {
                     for (const user of this.users.values()) {
                         chck = user.validationEmail(body.email);
+                        if(chck === false) break; //Exist
                     }
-                    if (chck) {
+                    if (chck === true) { // Not Exist
                         var user: User = this.users.get(id);
                         var success = user.modify(body);
                         if (success) {
@@ -306,13 +308,23 @@ export class UserService {
             > an email already exists in the databsae that is not the current user
     */
     deleteProfile(id: string): CRUDReturn {
-        try {
+        var resultData: {};
+        // try {
             let chck = this.searchID(id);
             if (chck === true) {
+                // for (const [key, user] of this.users.entries()) {
+                //     const id: string = user['id']
+                //     const name: string = user['name'];
+                //     const age: number = user['age'];
+                //     const email: string = user['email'];
+                //     resultData = {
+                //         id, name, age, email
+                //     };
+                // }
                 this.users.delete(id);
                 return {
-                    success: this.users.delete(id),
-                    data: `User ${id} has been deleted successfully`
+                    success: true,
+                    data: `${id} has been successfully removed`
                 };
             }
             else {
@@ -321,12 +333,12 @@ export class UserService {
                     data: `Id ${id} has not been found in the database!`
                 };
             }
-        } catch (error) {
-            return {
-                success: false,
-                data: error.message
-            };
-        }
+        // } catch (error) {
+        //     return {
+        //         success: false,
+        //         data: error.message
+        //     };
+        // }
     }
 
     lines() {
