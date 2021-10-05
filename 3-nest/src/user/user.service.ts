@@ -5,13 +5,13 @@ import { Helper } from './user.resource/helper';
 
 @Injectable()
 export class UserService {
-    private users: Map<string,User> = new Map<string,User>();
+    private users: Map<string, User> = new Map<string, User>();
 
-    constructor(){
+    constructor() {
         // this. = Helper.populate();
         this.populate();
     }
-    
+
     /* 
         TODO:
             > Creates a user and saves it to the database
@@ -21,65 +21,62 @@ export class UserService {
             > invalid attribute Key
             > Email ALready exists in database
     */
-    register(body: any):CRUDReturn {
-        var chck:boolean;
-        try{
+    register(body: any): CRUDReturn {
+        var chck: boolean;
+        try {
             var validBody: {
                 valid: boolean;
                 data: string
             } = Helper.validBodyPut(body);
 
-            if(validBody.valid){
-                for(const user of this.users.values()){
+            if (validBody.valid) {
+                for (const user of this.users.values()) {
                     chck = user.validationEmail(body.email);
-                    if(chck === false) break;
+                    if (chck === false) break;
                 }
                 console.log(chck);
-                if(chck === true){
-                    var ID:string = Helper.generateUID(); 
-                    var newUser:User = new User(
-                        ID,
+                if (chck === true) {
+                    var id: string = Helper.generateUID();
+                    var newUser: User = new User(
+                        id,
                         body?.name,
                         body?.age,
                         body?.email,
                         body?.password);
-                        console.log("ID: " + ID);
-                    if(this.saveToDataBase(newUser,ID)){
-                            console.log('nisud?')
-                            var resultData:{};
-                            for(const user of this.users.values()){
-                                if (user.validateID(ID)){
-                                    const name:string = user['name'];
-                                    const age:number = user['age'];
-                                    const email:string = user['email'];
-                            
-                                    // console.log(resultData.push({"name":name,"age":age,"email":email,"password":password}));
-                                    // resultData.push(user.toJson());
-                                    resultData = {
-                                        ID,name,age,email
-                                    };
-                                    console.log('sss');
-                                }
+                    console.log("id: " + id);
+                    if (this.saveToDataBase(newUser, id)) {
+                        console.log('nisud?')
+                        var resultData: {};
+                        for (const user of this.users.values()) {
+                            if (user.validateID(id)) {
+                                const name: string = user['name'];
+                                const age: number = user['age'];
+                                const email: string = user['email'];
+                                resultData = {
+                                    id, name, age, email
+                                };
+                                console.log('sss');
                             }
-                            return {
-                                success: true, 
-                                data: resultData
-                            };
+                        }
+                        return {
+                            success: true,
+                            data: resultData
+                        };
                     }
-                    else{
+                    else {
                         console.log('1 ' + body.id);
                         throw new Error(`Failed to update user in database`);
                     }
                 }
-                else{
+                else {
                     throw new Error(`${body.email} is already in use by another user!`);
                 }
             }
-            else{
+            else {
                 console.log('Hello')
                 throw new Error(validBody.data);
             }
-        }catch(error){
+        } catch (error) {
             console.log(error.message + ' h');
             return {
                 success: false, data: `Error adding account, ${error.message}`
@@ -88,15 +85,15 @@ export class UserService {
     }
 
 
-    saveToDataBase(body: any, ID:string): boolean{
-        try{
-            this.users.set(body.user,body);
-            console.log(body.id +' 4');
-            var chck = this.searchID(body.id);
+    saveToDataBase(body: any, id: string): boolean {
+        try {
+            this.users.set(body.id, body);
+            console.log(body.id + ' 4');
+            var chck = this.users.has(id);
             console.log('Save to db: chck' + chck)
             return chck;
         }
-        catch(error){
+        catch (error) {
             console.log(error)
             return false;
         }
@@ -106,25 +103,25 @@ export class UserService {
         TODO:
             > retrieves all uses data of all users || empty array
     */
-    getAll():CRUDReturn{
+    getAll(): CRUDReturn {
         var populatedData: Array<any> = [];
-        for(const user of this.users.values())
+        for (const user of this.users.values())
             populatedData.push(user.toJson());
         this.logAllUsers();
-        return {success: populatedData.length > 0, data: populatedData};
+        return { success: populatedData.length > 0, data: populatedData };
     }
 
 
 
-    populate(){
-        var id:string = Helper.generateUID();
-        this.users.set(id,new User(id,'Leanne Graham', 18, 'sincere@april.biz', 'LG_123456'));
+    populate() {
+        var id: string = Helper.generateUID();
+        this.users.set(id, new User(id, 'Leanne Graham', 18, 'sincere@april.biz', 'LG_123456'));
         id = Helper.generateUID();
-        this.users.set(id,new User(id,'Nathan Plains', 25, 'nathan@yesenia.net', 'NP_812415'));
+        this.users.set(id, new User(id, 'Nathan Plains', 25, 'nathan@yesenia.net', 'NP_812415'));
         id = Helper.generateUID();
-        this.users.set(id,new User(id,'Ervin Howell', 21, 'shanna@melissa.tv', 'EH_123123'));
+        this.users.set(id, new User(id, 'Ervin Howell', 21, 'shanna@melissa.tv', 'EH_123123'));
         id = Helper.generateUID();
-        this.users.set(id,new User(id,'Patricia Lebsack', 18, 'patty@kory.org', 'PL_12345'));
+        this.users.set(id, new User(id, 'Patricia Lebsack', 18, 'patty@kory.org', 'PL_12345'));
     }
 
 
@@ -141,11 +138,11 @@ export class UserService {
     //         this.users.set(ID,new User(ID,name,age,email,pwd));
     //     }
     // }
-    
-    logAllUsers(){
+
+    logAllUsers() {
         this.lines();
         console.log('User Credentials')
-        for(const [key,user] of this.users.entries()){
+        for (const [key, user] of this.users.entries()) {
             user.pri();
         }
         this.lines();
@@ -157,38 +154,25 @@ export class UserService {
         FIXME:
             > fails if parameter id does not match any users in database
     */
-    getID(id:string):CRUDReturn{
-        var chck:boolean;
-        var resultData:Array<any> = [];
-        try{
-            chck = this.searchID(id);
-            console.log('ID: id ' + id + ' Check')
-            if(this.users.has(id)){
-                console.log('t')
-                return {
-                    success: chck,
-                    data: this.users.get(id).toJson()
-                };
-            }
-            else{
-                console.log('f')
-                // const data_error ={
-                //     success: false,
-                //     data: mes
-                // }
-                // const {success,data} = data_error;
-                // return {
-                //     success: false, 
-                //     data: "Error"
-                // };
-                throw new Error(`User ${id} is not in database`);
-            }
-        }catch(error){
+    getID(id: string): CRUDReturn {
+        var chck: boolean;
+
+        chck = this.searchID(id);
+        console.log('ID: id ' + id + ' Check ' + chck)
+        if (chck === true) {
+            console.log('t')
+            return {
+                success: chck,
+                data: this.users.get(id).toJson()
+            };
+        }
+        else {
             return {
                 success: false,
-                data: error.message,
-            };  
+                data: `User ${id} is not in database`,
+            };
         }
+
     }
 
     /*
@@ -199,54 +183,55 @@ export class UserService {
             > missing an attributes
             > an email already exist in database that is not the current user
     */
-    replaceInfoByID(id:string,body:any):CRUDReturn{
-        var chck:boolean;
-        let newUser:User;
-        try{
+    replaceInfoByID(id: string, body: any): CRUDReturn {
+        var chck: boolean;
+        let newUser: User;
+        try {
             chck = this.searchID(id);
-        
-            if(chck === true){
+
+            if (chck === true) {
                 var validBodyPut: {
                     valid: boolean;
                     data: string
                 } = Helper.validBodyPut(body);
-                if(validBodyPut.valid){
-                    for(const user of this.users.values()){
+                if (validBodyPut.valid) {
+                    for (const user of this.users.values()) {
                         chck = user.validationEmail(body.email);
+                        if(chck === false) break;
                     }
-                    if(chck){
+                    if (chck === true) {
                         var user: User = this.users.get(id);
                         var success = user.modify(body);
-                        if(success){
+                        if (success) {
                             return {
                                 success: success,
                                 data: user.toJson()
                             };
                         }
-                        else{
+                        else {
                             throw new Error(`Failed to update user in database`);
                         }
                     }
-                    else{
+                    else {
                         throw new Error(`${body.email} is already in use by another user!)`);
                     }
                 }
-                else{
+                else {
                     throw new Error(validBodyPut.data);
                 }
             }
-            else{
+            else {
                 throw new Error(`User ${id} is not in the database`);
             }
-        }catch(error){
-            return { 
-                success: false, 
+        } catch (error) {
+            return {
+                success: false,
                 data: error.message
             }
         }
     }
 
-    
+
     /*
         TODO: does not replace the generate id
         FIXME: fails if the payload
@@ -254,73 +239,64 @@ export class UserService {
             > has an invalid attribute key
             > an email already exists in the databsae that is not the current user
     */
-    replaceInfoByID2(id:string,body:any):CRUDReturn{
-        var chck:boolean;
-        let newUser:User;
-        try{
+    replaceInfoByID2(id: string, body: any): CRUDReturn {
+        var chck: boolean;
+        let newUser: User;
+        try {
             chck = this.searchID(id);
-        
-            if(chck === true){
+
+            if (chck === true) {
                 var validBody: {
                     valid: boolean;
                     data: string
                 } = Helper.validBody(body);
-                if(validBody.valid){
-                    for(const user of this.users.values()){
+                if (validBody.valid) {
+                    for (const user of this.users.values()) {
                         chck = user.validationEmail(body.email);
+                        if(chck === false) break; //Exist
                     }
-                    if(chck){
+                    if (chck === true) { // Not Exist
                         var user: User = this.users.get(id);
                         var success = user.modify(body);
-                        if(success){
+                        if (success) {
                             return {
                                 success: success,
                                 data: user.toJson()
                             };
                         }
-                        else{
+                        else {
                             throw new Error(`Failed to update user in database`);
                         }
                     }
-                    else{
+                    else {
                         throw new Error(`${body.email} is already in use by another user!`);
                     }
                 }
-                else{
+                else {
                     throw new Error(validBody.data);
                 }
             }
-            else{
+            else {
                 throw new Error(`User ${id} is not in the database`);
             }
-        }catch(error){
-            return { 
-                success: false, 
+        } catch (error) {
+            return {
+                success: false,
                 data: error.message
             }
         }
     }
 
-    searchID(id:string){
-        try{
-        var chck:boolean;
-        console.log(id.length)
-        if(id.length === 27){
-            for(const [key,user] of this.users.entries()){
-                chck = user.validateID(id);
-                if(chck === true) {
-                    console.log(`Break : ${chck}`)
-                    break;
-                }
+    searchID(id: string) {
+        var chck: boolean;
+        for (const [key, user] of this.users.entries()) {
+            chck = user.validateID(id);
+            if (chck === true) {
+                console.log(`Break : ${chck}`)
+                break;
             }
-            return chck;
         }
-        else{
-            throw new Error(`Id ${id} has not been found in the database!`)
-        }
-        }catch(error){
-            return chck;
-        }
+        return chck;
     }
 
 
@@ -331,85 +307,95 @@ export class UserService {
             > has an invalid attribute key
             > an email already exists in the databsae that is not the current user
     */
-    deleteProfile(id:string):CRUDReturn{
-        try{
+    deleteProfile(id: string): CRUDReturn {
+        var resultData: {};
+        // try {
             let chck = this.searchID(id);
-            if(chck === true){
+            if (chck === true) {
+                // for (const [key, user] of this.users.entries()) {
+                //     const id: string = user['id']
+                //     const name: string = user['name'];
+                //     const age: number = user['age'];
+                //     const email: string = user['email'];
+                //     resultData = {
+                //         id, name, age, email
+                //     };
+                // }
                 this.users.delete(id);
                 return {
-                    success: this.users.delete(id),
-                    data: `User ${id} has been deleted successfully`
-                }; 
+                    success: true,
+                    data: `${id} has been successfully removed`
+                };
             }
-            else{
+            else {
                 return {
                     success: false,
                     data: `Id ${id} has not been found in the database!`
                 };
             }
-        }catch(error){
-            return {
-                    success: false,
-                    data: error.message
-            };  
-        }
+        // } catch (error) {
+        //     return {
+        //         success: false,
+        //         data: error.message
+        //     };
+        // }
     }
 
-    lines(){
+    lines() {
         console.log('----------------------------------------------------------------\n')
 
     }
 
-    login(body:any):CRUDReturn{
-        var chck:boolean;
-        var resultData:{};
-        try{
+    login(body: any): CRUDReturn {
+        var chck: boolean;
+        var resultData: {};
+        try {
             var validBody: {
                 valid: boolean;
                 data: string
             } = Helper.validBody(body);
-            if(validBody.valid){
-                for(const [key,user] of this.users.entries()){
+            if (validBody.valid) {
+                for (const [key, user] of this.users.entries()) {
                     chck = user.validationEmail(body.email);
-                    if(chck === false) break;
+                    if (chck === false) break;
                 }
-                if(chck === false){
-                    for(const [key,user] of this.users.entries()){
-                        if (user.login(body.email,body.password)){
-                            const ID:string = user['id']
-                            const name:string = user['name'];
-                            const age:number = user['age'];
-                            const email:string = user['email'];
+                if (chck === false) {
+                    for (const [key, user] of this.users.entries()) {
+                        if (user.login(body.email, body.password)) {
+                            const ID: string = user['id']
+                            const name: string = user['name'];
+                            const age: number = user['age'];
+                            const email: string = user['email'];
                             resultData = {
-                                        ID,name,age,email
+                                ID, name, age, email
                             };
                             chck = true;
                         }
                     }
-                    if(chck === true){
+                    if (chck === true) {
                         return {
-                                success: chck, 
-                                data: resultData
+                            success: chck,
+                            data: resultData
                         };
                     }
-                    else{
+                    else {
                         throw new Error(`${body.email} login fail, Email does not match with the password`);
                     }
                 }
-                else{
+                else {
                     throw new Error(`${body.email} login fail, Email does not exist in the database!`);
                 }
             }
-            else{
+            else {
                 console.log('Hello There')
                 throw new Error(validBody.data);
             }
-        }catch(error){
+        } catch (error) {
             console.log('hi there')
             return {
                 success: false,
                 data: error.message
-            };  
+            };
         }
     }
 
@@ -417,16 +403,16 @@ export class UserService {
         TODO: retrieves a user's data
         FIXME: Fails if the parameter id does not match any users in the database
     */
-    searchTerm(term:any):CRUDReturn{
-        var resultData:Array<any> = [];
+    searchTerm(term: any): CRUDReturn {
+        var resultData: Array<any> = [];
 
-        for(const user of this.users.values()){
-            if (user.retTermResult(term)){
-                resultData.push(user.toJson()); 
+        for (const user of this.users.values()) {
+            if (user.retTermResult(term)) {
+                resultData.push(user.toJson());
             }
         }
         return {
-            success: resultData.length > 0, 
+            success: resultData.length > 0,
             data: resultData
         };
     }
