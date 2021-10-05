@@ -80,12 +80,12 @@ export class Helper {
         try {
             for(var i = 0; i < 4; i++){
                 var result: Map<string, User> = new Map<string, User>();
-                var ID:string = Helper.generateUID();
+                var id:string = Helper.generateUID();
                 var name:string = Helper.full_name();
                 var pwd: string = Helper.pwd();
                 var age: number = Helper.age();
                 var email: string = Helper.email(name);
-                result.set(ID,new User(ID,name,age,email,pwd));
+                result.set(id,new User(id,name,age,email,pwd));
             }
         return result;
         } catch (error) {
