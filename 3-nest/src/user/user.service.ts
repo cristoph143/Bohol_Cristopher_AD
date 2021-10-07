@@ -23,7 +23,7 @@ export class UserService {
             > invalid attribute Key
             > Email ALready exists in database
     */
-    register(body: any): CRUDReturn {
+    async register(body: any): Promise<CRUDReturn> {
         var chck: boolean;
         try {
             var validBody: {
@@ -33,7 +33,7 @@ export class UserService {
 
             if (validBody.valid) {
                 for (const user of this.users.values()) {
-                    chck = user.validationEmail(body.email);
+                    chck = await user.validationEmail(body.email);
                     if (chck === false) break;
                 }
                 console.log(chck);
@@ -44,25 +44,33 @@ export class UserService {
                         body?.age,
                         body?.email,
                         body?.password);
-                    console.log("id: " + id);
-                    if (this.saveToDataBase(newUser, id)) {
+                    console.log("id: " + newUser.id);
+                    if (this.saveToDataBase(newUser)) {
                         console.log('nisud?')
                         var resultData: {};
                         for (const user of this.users.values()) {
-                            if (user.validateID(id)) {
-                                const name: string = user['name'];
-                                const age: number = user['age'];
-                                const email: string = user['email'];
-                                resultData = {
-                                    id, name, age, email
-                                };
-                                console.log('sss');
+                            chck = await user.validateID(user.id);
+                            if (chck === true) {
+                                // const id: string = user['id'];
+                                // const name: string = user['name'];
+                                // const age: number = user['age'];
+                                // const email: string = user['email'];
+                                // resultData = {
+                                //     id, name, age, email
+                                // };
+                                // console.log('sss');
+                                // chck = true;
+                                break;
                             }
                         }
-                        return {
-                            success: true,
-                            data: resultData
-                        };
+                        if (chck === true) {
+                            return {
+                                success: true,
+                                data: newUser.toJson()
+                            };
+                        } else {
+                            throw new Error("Generic Database Error!")
+                        }
                     }
                     else {
                         console.log('1 ' + body.id);
@@ -86,14 +94,14 @@ export class UserService {
     }
 
 
-    async saveToDataBase(body: User, id: string): Promise<boolean> {
+    async saveToDataBase(body: User): Promise<boolean> {
         try {
-            var result = await body.commitDB();
-            console.log(result);
-            return result.success;
             // this.users.set(body.id, body);
+            var result = await body.commitDB();
+            console.log(result + ' save?');
+            return result.success;
             // console.log(body.id + ' 4');
-            // var chck = this.users.has(id);
+            // var chck = this.users.has(body.id);
             // console.log('Save to db: chck' + chck)
             // return chck;
         }
@@ -101,7 +109,7 @@ export class UserService {
             console.log(error)
             return false;
         }
-    }n
+    }
 
     // //check if email not exist otherwise return false
     // async validationEmail(email: string): Promise<boolean> {
@@ -122,15 +130,6 @@ export class UserService {
     //             console.log(`${email} not exist`);
     //         return false;
     //     }
-    //     // if (email !== this.email) {
-    //     //     console.log(`${email} === ${this.email} not exist`);
-    //     //     return true;
-    //     // }
-    //     // else {
-
-    //     //     console.log(`${email} === ${this.email} exist`);
-    //     //     return false;
-    //     // }
     // }
 
     /*
@@ -145,7 +144,20 @@ export class UserService {
     //     return { success: populatedData.length > 0, data: populatedData };
     // }
 
-    async getAll(): Promise<Array<User>> {
+    async getAll(): Promise<CRUDReturn> {
+        var results: Array<any> = [];
+        try {
+            var allUsers = await this.getAllUserObject();
+            allUsers.forEach(user => {
+                results.push(user.toJson2());
+            })
+            console.log('hello all')
+        } catch (error) {
+            return { success: false, data: error }
+        }
+    }
+
+    async getAllUserObject(): Promise<Array<User>> {
         var result: Array<User> = [];
         try {
             var dbData: FirebaseFirestore.QuerySnapshot<FirebaseFirestore.DocumentData> = await this.DB.collection("users").get();
@@ -193,22 +205,33 @@ export class UserService {
         FIXME:
             > fails if parameter id does not match any users in database
     */
-    getID(id: string): CRUDReturn {
+    async getID(id: string): Promise<CRUDReturn> {
         var chck: boolean;
 
-        chck = this.searchID(id);
-        console.log('ID: id ' + id + ' Check ' + chck)
-        if (chck === true) {
-            console.log('t')
-            return {
-                success: chck,
-                data: this.users.get(id).toJson()
-            };
-        }
-        else {
+        try {
+
+            chck = await this.searchID(id);
+            console.log('ID: id ' + id + ' Check ' + chck)
+            if (chck === true) {
+                console.log('t')
+                var dbData = await this.DB.collection("users").doc(id).get();//Get the Data from the Database
+                console.log("result " + dbData)
+                return {
+                    success: chck,
+                    data: dbData
+                };
+            }
+            else {
+                return {
+                    success: false,
+                    data: `User ${id} is not in database`,
+                };
+            }
+        } catch (e) {
+
             return {
                 success: false,
-                data: `User ${id} is not in database`,
+                data: e.message,
             };
         }
 
@@ -222,11 +245,11 @@ export class UserService {
             > missing an attributes
             > an email already exist in database that is not the current user
     */
-    replaceInfoByID(id: string, body: any): CRUDReturn {
+    async replaceInfoByID(id: string, body: any): Promise<CRUDReturn> {
         var chck: boolean;
         let newUser: User;
         try {
-            chck = this.searchID(id);
+            chck = await this.searchID(id);
 
             if (chck === true) {
                 var validBodyPut: {
@@ -235,8 +258,8 @@ export class UserService {
                 } = Helper.validBodyPut(body);
                 if (validBodyPut.valid) {
                     for (const user of this.users.values()) {
-                        chck = user.validationEmail(body.email);
-                        if(chck === false) break;
+                        chck = await user.validationEmail(body.email);
+                        if (chck === false) break;
                     }
                     if (chck === true) {
                         var user: User = this.users.get(id);
@@ -278,11 +301,11 @@ export class UserService {
             > has an invalid attribute key
             > an email already exists in the databsae that is not the current user
     */
-    replaceInfoByID2(id: string, body: any): CRUDReturn {
+    async replaceInfoByID2(id: string, body: any): Promise<CRUDReturn> {
         var chck: boolean;
         let newUser: User;
         try {
-            chck = this.searchID(id);
+            chck = await this.searchID(id);
 
             if (chck === true) {
                 var validBody: {
@@ -291,8 +314,8 @@ export class UserService {
                 } = Helper.validBody(body);
                 if (validBody.valid) {
                     for (const user of this.users.values()) {
-                        chck = user.validationEmail(body.email);
-                        if(chck === false) break; //Exist
+                        chck = await user.validationEmail(body.email);
+                        if (chck === false) break; //Exist
                     }
                     if (chck === true) { // Not Exist
                         var user: User = this.users.get(id);
@@ -326,12 +349,13 @@ export class UserService {
         }
     }
 
-    searchID(id: string) {
+    async searchID(id: string): Promise<boolean> {
         var chck: boolean;
         for (const [key, user] of this.users.entries()) {
-            chck = user.validateID(id);
-            if (chck === true) {
+            chck = await user.validateID(id);
+            if (chck === false) {
                 console.log(`Break : ${chck}`)
+                chck = true;
                 break;
             }
         }
@@ -346,10 +370,10 @@ export class UserService {
             > has an invalid attribute key
             > an email already exists in the databsae that is not the current user
     */
-    deleteProfile(id: string): CRUDReturn {
+    async deleteProfile(id: string): Promise<CRUDReturn> {
         var resultData: {};
         // try {
-        let chck = this.searchID(id);
+        let chck = await this.searchID(id);
         if (chck === true) {
             // for (const [key, user] of this.users.entries()) {
             //     const id: string = user['id']
@@ -385,7 +409,7 @@ export class UserService {
 
     }
 
-    login(body: any): CRUDReturn {
+    async login(body: any): Promise<CRUDReturn> {
         var chck: boolean;
         var resultData: {};
         try {
@@ -395,7 +419,7 @@ export class UserService {
             } = Helper.validBody(body);
             if (validBody.valid) {
                 for (const [key, user] of this.users.entries()) {
-                    chck = user.validationEmail(body.email);
+                    chck = await user.validationEmail(body.email);
                     if (chck === false) break;
                 }
                 if (chck === false) {

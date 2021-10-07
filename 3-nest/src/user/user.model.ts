@@ -28,7 +28,7 @@ export class User {
                 else
                     null
     */
-    static async retrieveDB(id: string): Promise<User> {
+    async retrieveDB(id: string): Promise<User> {
         try {
             var DB = admin.firestore();//connect to database
             var result = await DB.collection("users").doc(id).get();//Get the Data from the Database
@@ -68,6 +68,7 @@ export class User {
 
     toJson() {
         return {
+            id: this.id,
             name: this.name,
             age: this.age,
             email: this.email
@@ -97,47 +98,73 @@ export class User {
     }
 
     //check if email not exist otherwise return false
-    validationEmail(email: string){
+    // validationEmail(email: string){
         
-        if (email !== this.email) {
-            console.log(`${email} !== ${this.email} not exist`);
-            return true;
-        }
-        else {
+    //     if (email !== this.email) {
+    //         console.log(`${email} !== ${this.email} not exist`);
+    //         return true;
+    //     }
+    //     else {
 
-            console.log(`${email} === ${this.email} exist`);
-            return false;
-        }
-    }
-
-
-    //check if email not exist otherwise return false
-    // async validationEmail(email: string): Promise<boolean> {
-    //     var DB = admin.firestore();//connect to database
-    //     var result = await DB.collection("users").where("email", "==", email).get();
-    //     if (result.size > 0) {
-    //         for (const doc of result.docs) {
-    //             if (doc.data()["email"] !== email) {
-    //                     console.log(`${email} !== ${this.email} exist`);
-    //                 return true;
-    //             }
-    //         }
-    //     } else {
-    //             console.log(`${email} === ${this.email} exist`);
+    //         console.log(`${email} === ${this.email} exist`);
     //         return false;
     //     }
     // }
 
-    validateID(id: string) {
-        if (id === this.id) {
-            console.log(`ID: ${id} === This.id: ${this.id} ??? Equal`);
+
+    //check if email not exist otherwise return false
+    async validationEmail(email: string): Promise<boolean> {
+        var DB = admin.firestore();//connect to database
+        var result = await DB.collection("users").where("email", "==", email).get();
+        if (result.size > 0) {
+            for (const doc of result.docs) {
+                if (doc.data()["email"] === email) {
+                        console.log(`${email} === ${this.email} exist`);
+                    return false;
+                }
+                else{
+                    console.log(`${email} !== ${this.email} exist`);
+                    return true;
+                }
+            }
+        } else {
+                console.log(`Empty Database!`);
             return true;
         }
-        else {
-            console.log(`ID: ${id} !== This.id: ${this.id} ??? Not Equal`);
-            return false;
+    }
+
+
+
+    async validateID(id: string): Promise<boolean> {
+        var DB = admin.firestore();//connect to database
+        var result = await DB.collection("users").where("id", "==", id).get();
+        if (result.size > 0) {
+            for (const doc of result.docs) {
+                if (doc.data()["id"] === id) {
+                        console.log(`${id} === ${this.id} exist`);
+                    return false;
+                }
+                else{
+                    console.log(`${id} !== ${this.id} exist`);
+                    return true;
+                }
+            }
+        } else {
+                console.log(`Empty Database!`);
+            return true;
         }
     }
+
+    // validateID(id: string) {
+    //     if (id === this.id) {
+    //         console.log(`ID: ${id} === This.id: ${this.id} ??? Equal`);
+    //         return true;
+    //     }
+    //     else {
+    //         console.log(`ID: ${id} !== This.id: ${this.id} ??? Not Equal`);
+    //         return false;
+    //     }
+    // }
 
     lines() {
         console.log('----------------------------------------------------------------\n')
