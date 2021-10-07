@@ -40,7 +40,6 @@ export class UserService {
                 if (chck === true) {
                     var id: string = Helper.generateUID();
                     var newUser: User = new User(
-                        id,
                         body?.name,
                         body?.age,
                         body?.email,
