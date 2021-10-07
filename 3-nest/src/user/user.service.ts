@@ -9,10 +9,10 @@ export class UserService {
     private users: Map<string, User> = new Map<string, User>();
     private DB = admin.firestore();
 
-    constructor() {
-        // this. = Helper.populate();
-        this.populate();
-    }
+    // constructor() {
+    //     // this. = Helper.populate();
+    //     this.populate();
+    // }
 
     /* 
         TODO:
@@ -152,6 +152,10 @@ export class UserService {
                 results.push(user.toJson2());
             })
             console.log('hello all')
+            return {
+                success: true,
+                data: results
+            }
         } catch (error) {
             return { success: false, data: error }
         }
@@ -167,9 +171,9 @@ export class UserService {
                     result.push(new User(
                         data["name"], data["age"], data["email"], data["password"], data["id"]
                     ))
-                    console.log(result);
                 }
             });
+            console.log('result1 '+result);
             return result;
             // for (const user of this.users.values())
             //     populatedData.push(user.toJson());
@@ -190,13 +194,18 @@ export class UserService {
         this.users.set(id, new User('Patricia Lebsack', 18, 'patty@kory.org', 'PL_12345', id));
     }
 
-    logAllUsers() {
+    async logAllUsers(): Promise<CRUDReturn> {
         this.lines();
         console.log('User Credentials')
-        for (const [key, user] of this.users.entries()) {
-            user.pri();
-        }
         this.lines();
+        var val: {};
+        val = await this.getAllUserObject();
+        console.log('val');
+        console.log(val);
+        this.lines();
+        return {
+            success: true, data: val
+        }
     }
 
     /*
@@ -214,8 +223,15 @@ export class UserService {
             console.log('ID: id ' + id + ' Check ' + chck)
             if (chck === true) {
                 console.log('t')
-                var dbData = await this.DB.collection("users").doc(id).get();//Get the Data from the Database
-                console.log("result " + dbData)
+                var dbData: {};
+                for (const [key, user] of this.users.entries()) {
+                    chck = await user.validateID(id);
+                    if (chck === false) {
+                        console.log(`Break : ${chck}`)
+                        dbData = await user.retrieveDB(id);
+                        break;
+                    }
+                }
                 return {
                     success: chck,
                     data: dbData
