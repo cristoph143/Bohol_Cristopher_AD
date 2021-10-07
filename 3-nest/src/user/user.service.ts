@@ -1,3 +1,4 @@
+import * as admin from 'firebase-admin';
 import { Injectable } from '@nestjs/common';
 import { User } from './user.model';
 import { CRUDReturn } from './user.resource/crud_return.interface';
@@ -6,6 +7,7 @@ import { Helper } from './user.resource/helper';
 @Injectable()
 export class UserService {
     private users: Map<string, User> = new Map<string, User>();
+    private DB = admin.firestore();
 
     constructor() {
         // this. = Helper.populate();
@@ -85,59 +87,97 @@ export class UserService {
     }
 
 
-    saveToDataBase(body: any, id: string): boolean {
+    async saveToDataBase(body: User, id: string): Promise<boolean> {
         try {
-            this.users.set(body.id, body);
-            console.log(body.id + ' 4');
-            var chck = this.users.has(id);
-            console.log('Save to db: chck' + chck)
-            return chck;
+            var result = await body.commitDB();
+            console.log(result);
+            return result.success;
+            // this.users.set(body.id, body);
+            // console.log(body.id + ' 4');
+            // var chck = this.users.has(id);
+            // console.log('Save to db: chck' + chck)
+            // return chck;
         }
         catch (error) {
             console.log(error)
             return false;
         }
-    }
+    }n
+
+    // //check if email not exist otherwise return false
+    // async validationEmail(email: string): Promise<boolean> {
+    //     // var DB = admin.firestore();//connect to database
+    //     var result = await this.DB.collection("users").where("email", "==", email).get();
+    //     if (result.size > 0) {
+    //         for (const doc of result.docs) {
+    //             var data = doc.data();
+    //             if (data["email"] === email) {
+    //                     console.log(`${email} === ${data["email"]} exist`);
+    //                 return false;
+    //             } else {
+    //                     console.log(`${email} === ${data["email"]} not exist`);
+    //                 return true;
+    //             }
+    //         }
+    //     } else {
+    //             console.log(`${email} not exist`);
+    //         return false;
+    //     }
+    //     // if (email !== this.email) {
+    //     //     console.log(`${email} === ${this.email} not exist`);
+    //     //     return true;
+    //     // }
+    //     // else {
+
+    //     //     console.log(`${email} === ${this.email} exist`);
+    //     //     return false;
+    //     // }
+    // }
 
     /*
         TODO:
             > retrieves all uses data of all users || empty array
     */
-    getAll(): CRUDReturn {
-        var populatedData: Array<any> = [];
-        for (const user of this.users.values())
-            populatedData.push(user.toJson());
-        this.logAllUsers();
-        return { success: populatedData.length > 0, data: populatedData };
+    // getAll(): CRUDReturn {
+    //     var populatedData: Array<any> = [];
+    //     for (const user of this.users.values())
+    //         populatedData.push(user.toJson());
+    //     this.logAllUsers();
+    //     return { success: populatedData.length > 0, data: populatedData };
+    // }
+
+    async getAll(): Promise<Array<User>> {
+        var result: Array<User> = [];
+        try {
+            var dbData: FirebaseFirestore.QuerySnapshot<FirebaseFirestore.DocumentData> = await this.DB.collection("users").get();
+            dbData.forEach((doc) => {
+                if (doc.exists) {
+                    var data = doc.data();
+                    result.push(new User(
+                        data["name"], data["age"], data["email"], data["password"], data["id"]
+                    ))
+                    console.log(result);
+                }
+            });
+            return result;
+            // for (const user of this.users.values())
+            //     populatedData.push(user.toJson());
+            // this.logAllUsers();
+        } catch (error) {
+            return null
+        }
     }
-
-
 
     populate() {
         var id: string = Helper.generateUID();
-        this.users.set(id, new User(id, 'Leanne Graham', 18, 'sincere@april.biz', 'LG_123456'));
+        this.users.set(id, new User('Leanne Graham', 18, 'sincere@april.biz', 'LG_123456', id));
         id = Helper.generateUID();
-        this.users.set(id, new User(id, 'Nathan Plains', 25, 'nathan@yesenia.net', 'NP_812415'));
+        this.users.set(id, new User('Nathan Plains', 25, 'nathan@yesenia.net', 'NP_812415', id));
         id = Helper.generateUID();
-        this.users.set(id, new User(id, 'Ervin Howell', 21, 'shanna@melissa.tv', 'EH_123123'));
+        this.users.set(id, new User('Ervin Howell', 21, 'shanna@melissa.tv', 'EH_123123', id));
         id = Helper.generateUID();
-        this.users.set(id, new User(id, 'Patricia Lebsack', 18, 'patty@kory.org', 'PL_12345'));
+        this.users.set(id, new User('Patricia Lebsack', 18, 'patty@kory.org', 'PL_12345', id));
     }
-
-
-
-    // populate(){
-    //     var newUser:User;
-    //     for(var i = 1; i < 5; i++){
-    //         var ID:string = Helper.generateUID();
-    //         var name:string = Helper.full_name();
-    //         var pwd: string = Helper.pwd();
-    //         var age: number = Helper.age();
-    //         var email: string = Helper.email(name);
-    //         console.log(pwd);
-    //         this.users.set(ID,new User(ID,name,age,email,pwd));
-    //     }
-    // }
 
     logAllUsers() {
         this.lines();
@@ -310,29 +350,29 @@ export class UserService {
     deleteProfile(id: string): CRUDReturn {
         var resultData: {};
         // try {
-            let chck = this.searchID(id);
-            if (chck === true) {
-                // for (const [key, user] of this.users.entries()) {
-                //     const id: string = user['id']
-                //     const name: string = user['name'];
-                //     const age: number = user['age'];
-                //     const email: string = user['email'];
-                //     resultData = {
-                //         id, name, age, email
-                //     };
-                // }
-                this.users.delete(id);
-                return {
-                    success: true,
-                    data: `${id} has been successfully removed`
-                };
-            }
-            else {
-                return {
-                    success: false,
-                    data: `Id ${id} has not been found in the database!`
-                };
-            }
+        let chck = this.searchID(id);
+        if (chck === true) {
+            // for (const [key, user] of this.users.entries()) {
+            //     const id: string = user['id']
+            //     const name: string = user['name'];
+            //     const age: number = user['age'];
+            //     const email: string = user['email'];
+            //     resultData = {
+            //         id, name, age, email
+            //     };
+            // }
+            this.users.delete(id);
+            return {
+                success: true,
+                data: `${id} has been successfully removed`
+            };
+        }
+        else {
+            return {
+                success: false,
+                data: `Id ${id} has not been found in the database!`
+            };
+        }
         // } catch (error) {
         //     return {
         //         success: false,
