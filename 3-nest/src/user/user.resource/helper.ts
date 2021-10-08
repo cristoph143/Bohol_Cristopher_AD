@@ -85,7 +85,7 @@ export class Helper {
                 var pwd: string = Helper.pwd();
                 var age: number = Helper.age();
                 var email: string = Helper.email(name);
-                result.set(id,new User(id,name,age,email,pwd));
+                result.set(id,new User(name,age,email,pwd,id));
             }
         return result;
         } catch (error) {
