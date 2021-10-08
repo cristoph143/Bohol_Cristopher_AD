@@ -3,7 +3,7 @@ import * as admin from 'firebase-admin';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
-const DB_CREDENTIALS = require("../my-new-key.json");
+const DB_CREDENTIALS = require("../new-keys.json");
 
 async function bootstrap() {
 

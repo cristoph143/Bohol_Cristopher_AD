@@ -1,7 +1,7 @@
 # compiled output
 3-nest/dist
 3-nest/node_modules
-my-new-key.json
+new-keys.json
 # Logs
 logs
 *.log
