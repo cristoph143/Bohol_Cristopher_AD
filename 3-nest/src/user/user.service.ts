@@ -10,8 +10,9 @@ export class UserService {
     private DB = admin.firestore();
 
     // constructor() {
-    //     // this. = Helper.populate();
-    //     this.populate();
+    // //     // this. = Helper.populate();
+    // //     this.populate();
+
     // }
 
     /* 
@@ -32,11 +33,8 @@ export class UserService {
             } = Helper.validBodyPut(body);
 
             if (validBody.valid) {
-                for (const user of this.users.values()) {
-                    chck = await user.validationEmail(body.email);
-                    if (chck === false) break;
-                }
                 console.log(chck);
+                chck = await User.validationEmail(body.email);
                 if (chck === true) {
                     var id: string = Helper.generateUID();
                     var newUser: User = new User(
@@ -44,25 +42,10 @@ export class UserService {
                         body?.age,
                         body?.email,
                         body?.password);
-                    console.log("id: " + newUser.id);
-                    if (this.saveToDataBase(newUser)) {
+                    console.log("id: " + id);
+                    chck = await this.saveToDataBase(newUser);
+                    if (chck === true) {
                         console.log('nisud?')
-                        var resultData: {};
-                        for (const user of this.users.values()) {
-                            chck = await user.validateID(user.id);
-                            if (chck === true) {
-                                // const id: string = user['id'];
-                                // const name: string = user['name'];
-                                // const age: number = user['age'];
-                                // const email: string = user['email'];
-                                // resultData = {
-                                //     id, name, age, email
-                                // };
-                                // console.log('sss');
-                                // chck = true;
-                                break;
-                            }
-                        }
                         if (chck === true) {
                             return {
                                 success: true,
@@ -73,7 +56,7 @@ export class UserService {
                         }
                     }
                     else {
-                        console.log('1 ' + body.id);
+                        console.log('1 ' + id);
                         throw new Error(`Failed to update user in database`);
                     }
                 }
@@ -100,10 +83,6 @@ export class UserService {
             var result = await body.commitDB();
             console.log(result + ' save?');
             return result.success;
-            // console.log(body.id + ' 4');
-            // var chck = this.users.has(body.id);
-            // console.log('Save to db: chck' + chck)
-            // return chck;
         }
         catch (error) {
             console.log(error)
@@ -131,6 +110,40 @@ export class UserService {
     //         return false;
     //     }
     // }
+
+    async validationEmail(email: string, options?: { exceptionId: string }): Promise<boolean> {
+        try {
+            console.log('valid?')
+            var DB = admin.firestore();//connect to database
+            var result = await DB.collection("users").where("email", "==", email).get();
+            if (result.empty) {
+                console.log(`Empty Database!`);
+                return true;
+            }
+            for (const doc of result.docs) {
+                var data = doc.data();
+                if (options != undefined) {
+                    if (doc.id === options?.exceptionId) {
+                        continue;
+                    }
+                }
+                if (doc.data()["email"] === email) {
+                    console.log(`${email} === ${data.email} exist`);
+                    return false;
+                }
+                else {
+                    console.log(`${email} !== ${data.email} exist`);
+                    return true;
+                }
+            }
+            return true;
+        }
+        catch (error) {
+            console.log('email exist')
+            console.log(error.message);
+            return false;
+        }
+    }
 
     /*
         TODO:
@@ -173,7 +186,7 @@ export class UserService {
                     ))
                 }
             });
-            console.log('result1 '+result);
+            console.log('result1 ' + result);
             return result;
             // for (const user of this.users.values())
             //     populatedData.push(user.toJson());
@@ -224,14 +237,14 @@ export class UserService {
             if (chck === true) {
                 console.log('t')
                 var dbData: {};
-                for (const [key, user] of this.users.entries()) {
-                    chck = await user.validateID(id);
-                    if (chck === false) {
-                        console.log(`Break : ${chck}`)
-                        dbData = await user.retrieveDB(id);
-                        break;
-                    }
+                // for (const [key, user] of this.users.entries()) {
+                chck = await User.validateID(id);
+                if (chck === false) {
+                    console.log(`Break : ${chck}`)
+                    dbData = await User.retrieveDB(id);
+                    // break;
                 }
+                // }
                 return {
                     success: chck,
                     data: dbData
@@ -264,30 +277,31 @@ export class UserService {
     async replaceInfoByID(id: string, body: any): Promise<CRUDReturn> {
         var chck: boolean;
         let newUser: User;
+        var dbData: {};
         try {
             chck = await this.searchID(id);
-
+            console.log(chck)
             if (chck === true) {
+                console.log(chck)
                 var validBodyPut: {
                     valid: boolean;
                     data: string
                 } = Helper.validBodyPut(body);
                 if (validBodyPut.valid) {
-                    for (const user of this.users.values()) {
-                        chck = await user.validationEmail(body.email);
-                        if (chck === false) break;
-                    }
+                    console.log('h')
+                    chck = await User.validationEmail(body.email);
+                    console.log('d' + body.email)
+                    console.log(chck)
                     if (chck === true) {
                         var user: User = this.users.get(id);
-                        var success = user.modify(body);
-                        if (success) {
+                        var success = await user.modify(body);
+                        if (success)
                             return {
                                 success: success,
-                                data: user.toJson()
+                                data: user.toJson(),
                             };
-                        }
                         else {
-                            throw new Error(`Failed to update user in database`);
+                            throw new Error('Failed to update user in db');
                         }
                     }
                     else {
@@ -330,12 +344,12 @@ export class UserService {
                 } = Helper.validBody(body);
                 if (validBody.valid) {
                     for (const user of this.users.values()) {
-                        chck = await user.validationEmail(body.email);
+                        chck = await User.validationEmail(body.email);
                         if (chck === false) break; //Exist
                     }
                     if (chck === true) { // Not Exist
                         var user: User = this.users.get(id);
-                        var success = user.modify(body);
+                        var success = await user.modify(body);
                         if (success) {
                             return {
                                 success: success,
@@ -367,14 +381,14 @@ export class UserService {
 
     async searchID(id: string): Promise<boolean> {
         var chck: boolean;
-        for (const [key, user] of this.users.entries()) {
-            chck = await user.validateID(id);
-            if (chck === false) {
-                console.log(`Break : ${chck}`)
-                chck = true;
-                break;
-            }
+        // for (const [key, user] of this.users.entries()) {
+        chck = await User.validateID(id);
+        if (chck === false) {
+            console.log(`Break : ${chck}`)
+            chck = true;
+            // break;
         }
+        // }
         return chck;
     }
 
@@ -435,7 +449,7 @@ export class UserService {
             } = Helper.validBody(body);
             if (validBody.valid) {
                 for (const [key, user] of this.users.entries()) {
-                    chck = await user.validationEmail(body.email);
+                    chck = await User.validationEmail(body.email);
                     if (chck === false) break;
                 }
                 if (chck === false) {

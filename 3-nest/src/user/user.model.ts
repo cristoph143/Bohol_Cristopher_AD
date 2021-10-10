@@ -28,7 +28,7 @@ export class User {
                 else
                     null
     */
-    async retrieveDB(id: string): Promise<User> {
+    static async retrieveDB(id: string): Promise<User> {
         try {
             var DB = admin.firestore();//connect to database
             var result = await DB.collection("users").doc(id).get();//Get the Data from the Database
@@ -66,12 +66,24 @@ export class User {
         }
     }
 
+    static toJsonStatic(body: User) {
+
+        return {
+            id: body.id,
+            name: body.name,
+            age: body.age,
+            email: body.email,
+            password: body.password
+        }
+    }
+
     toJson() {
         return {
             id: this.id,
             name: this.name,
             age: this.age,
-            email: this.email
+            email: this.email,
+            password: this.password
         }
     }
     toJson2() {
@@ -83,86 +95,121 @@ export class User {
         }
     }
 
-    modify(body: any): boolean {
-        if (body.id != null)
-            this.id = body.id;
-        if (body.email != null)
-            this.email = body.email;
-        if (body.age != null)
-            this.age = body.age;
-        if (body.name != null)
-            this.name = body.name;
-        if (body.password != null)
-            this.password = body.password;
-        return true;
+    async modify(body: any): Promise<boolean> {
+        // // body.commitDB()
+        // if (body.id != null)
+        //     this.id = body.id;
+        // if (body.email != null)
+        //     this.email = body.email;
+        // if (body.age != null)
+        //     this.age = body.age;
+        // if (body.name != null)
+        //     this.name = body.name;
+        // if (body.password != null)
+        //     this.password = body.password;
+        //     // console.log(user)
+        // // user.commitDB()
+        // return true;
+
+
+        try {
+            var keys: Array<string> = Helper.describeClass(User);
+            keys = Helper.removeItemOnce(keys, 'id');
+            for (const key of Object.keys(body)) {
+                this[key] = body[key];
+            }
+            return true;
+        } catch (error) {
+            console.log(error);
+            return false;
+        }
     }
 
     //check if email not exist otherwise return false
-    // validationEmail(email: string){
-        
-    //     if (email !== this.email) {
-    //         console.log(`${email} !== ${this.email} not exist`);
-    //         return true;
-    //     }
-    //     else {
-
-    //         console.log(`${email} === ${this.email} exist`);
-    //         return false;
-    //     }
-    // }
-
-
-    //check if email not exist otherwise return false
-    async validationEmail(email: string): Promise<boolean> {
-        var DB = admin.firestore();//connect to database
-        var result = await DB.collection("users").where("email", "==", email).get();
-        if (result.size > 0) {
+    static async validationEmail(email: string, options?: { exceptionId: string }): Promise<boolean> {
+        try {
+            console.log('valid?')
+            var DB = admin.firestore();//connect to database
+            var result = await DB.collection("users").where("email", "==", email).get();
+            // console.log(result)
+            if (result.empty) {
+                console.log(`Empty Database!`);
+                return true;
+            }
             for (const doc of result.docs) {
+                var data = doc.data();
+                if (options != undefined) {
+                    if (doc.id === options?.exceptionId) {
+                        continue;
+                    }
+                }
                 if (doc.data()["email"] === email) {
-                        console.log(`${email} === ${this.email} exist`);
+                    console.log(`${email} === ${data.email} exist`);
                     return false;
                 }
-                else{
-                    console.log(`${email} !== ${this.email} exist`);
+                else {
+                    console.log(`${email} !== ${data.email} exist`);
                     return true;
                 }
             }
-        } else {
-                console.log(`Empty Database!`);
             return true;
+        }
+        catch (error) {
+            console.log('email exist')
+            console.log(error.message);
+            return false;
         }
     }
 
 
-
-    async validateID(id: string): Promise<boolean> {
-        var DB = admin.firestore();//connect to database
-        var result = await DB.collection("users").where("id", "==", id).get();
-        if (result.size > 0) {
+    static async validateID(id: string): Promise<boolean> {
+        try {
+            console.log('valid?')
+            var DB = admin.firestore();//connect to database
+            var result = await DB.collection("users").where("id", "==", id).get();
+            if (result.empty) {
+                console.log(`Empty Database!`);
+                return false;
+            }
             for (const doc of result.docs) {
+                var data = doc.data();
                 if (doc.data()["id"] === id) {
-                        console.log(`${id} === ${this.id} exist`);
-                    return false;
-                }
-                else{
-                    console.log(`${id} !== ${this.id} exist`);
+                    console.log(`${id} === ${data.id} exist`);
                     return true;
                 }
+                else {
+                    console.log(`${id} !== ${data.id} not exist`);
+                    return false;
+                }
             }
-        } else {
-                console.log(`Empty Database!`);
+            return false;
+        }
+        catch (error) {
+            console.log('id exist')
+            console.log(error.message);
             return true;
         }
     }
 
-    // validateID(id: string) {
-    //     if (id === this.id) {
-    //         console.log(`ID: ${id} === This.id: ${this.id} ??? Equal`);
+
+
+    // async validateID(id: string): Promise<boolean> {
+    //     var DB = admin.firestore();//connect to database
+    //     var result = await DB.collection("users").where("id", "==", id).get();
+    //     if (result.size > 0) {
+    //         for (const doc of result.docs) {
+    //             if (doc.data()["id"] === id) {
+    //                 console.log(`${id} === ${this.id} exist`);
+    //                 return false;
+    //             }
+    //             else {
+    //                 console.log(`${id} !== ${this.id} exist`);
+    //                 return true;
+    //             }
+    //         }
+    //     } else {
+    //         console.log(`Empty Database!`);
     //         return true;
-    //     }
-    //     else {
-    //         console.log(`ID: ${id} !== This.id: ${this.id} ??? Not Equal`);
-    //         return false;
     //     }
     // }
 
