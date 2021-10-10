@@ -244,15 +244,47 @@ export class User {
         return false;
     }
 
-    login(email: string, password: string) {
+    static async login(email: string, password: string) {
+        // try {
+        //     console.log('valid?')
+        
+        var DB = admin.firestore();//connect to database
+        var result = await DB.collection("users").where("email", "==", email).get();
 
-        if (email === this.email && password === this.password) {
-            return true;
-        }
-        else {
+        if (result.empty) {
+            console.log(`Empty Database!`);
             return false;
         }
+        for (const doc of result.docs) {
+            var data = doc.data();
+            if (data["email"] === email && data["password"] === password) {
+                console.log(`${email} === ${password} Equal`);
+                console.log(`${data[email]} === ${data[password]} Equal`);
+                return true;
+            }
+            else {
+                console.log(`${email} !== ${password} Not Match`);
+                console.log(`${data[email]} !== ${data[password]} Not Match`);
+                return false;
+            }
+        }
+        console.log('unsa')
+        return false;
     }
+    // catch (error) {
+    //     console.log('email exist')
+    //     console.log(error.message);
+    //     return false;
+    // }
+
+
+        // if (email === this.email && password === this.password) {
+        //     return true;
+        // }
+        // else {
+        //     return false;
+        // }
+    // }
 
 
     pri() {

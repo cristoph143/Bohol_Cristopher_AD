@@ -488,38 +488,29 @@ export class UserService {
     */
     async deleteProfile(id: string): Promise<CRUDReturn> {
         var resultData: {};
-        // try {
-        let chck = await this.searchID(id);
-        if (chck === true) {
-            
-            var result = await this.DB.collection("users").doc(id).delete();
-            // for (const [key, user] of this.users.entries()) {
-            //     const id: string = user['id']
-            //     const name: string = user['name'];
-            //     const age: number = user['age'];
-            //     const email: string = user['email'];
-            //     resultData = {
-            //         id, name, age, email
-            //     };
-            // }
-            this.users.delete(id);
-            return {
-                success: true,
-                data: `${id} has been successfully removed`
-            };
-        }
-        else {
+        try {
+            let chck = await this.searchID(id);
+            if (chck === true) {
+
+                var result = await this.DB.collection("users").doc(id).delete();
+                this.users.delete(id);
+                return {
+                    success: true,
+                    data: `${id} has been successfully removed`
+                };
+            }
+            else {
+                return {
+                    success: false,
+                    data: `Id ${id} has not been found in the database!`
+                };
+            }
+        } catch (error) {
             return {
                 success: false,
-                data: `Id ${id} has not been found in the database!`
+                data: error.message
             };
         }
-        // } catch (error) {
-        //     return {
-        //         success: false,
-        //         data: error.message
-        //     };
-        // }
     }
 
     lines() {
@@ -537,26 +528,31 @@ export class UserService {
             } = Helper.validBody(body);
             if (validBody.valid) {
                 // for (const [key, user] of this.users.entries()) {
-                    chck = await User.validationEmail(body.email);
-                    // if (chck === false) break;
+                chck = await User.validationEmail(body.email);
+                console.log(chck)
+                // if (chck === false) break;
                 // }
                 if (chck === false) {
-                    for (const [key, user] of this.users.entries()) {
-                        if (user.login(body.email, body.password)) {
-                            const ID: string = user['id']
-                            const name: string = user['name'];
-                            const age: number = user['age'];
-                            const email: string = user['email'];
-                            resultData = {
-                                ID, name, age, email
-                            };
+                    var result = this.DB.collection("users").where("email", "==", body.email).where("password", "==",body.password);
+                    // console.log(result);
+                    // resultData = await User.retrieveDB
+                    // for (const [key, user] of this.users.entries()) {
+                        chck = await User.login(body.email, body.password);
+                        if (chck === true) {
+                            // const ID: string = user['id']
+                            // const name: string = user['name'];
+                            // const age: number = user['age'];
+                            // const email: string = user['email'];
+                            // resultData = {
+                            //     ID, name, age, email
+                            // };
                             chck = true;
                         }
-                    }
+                    // }
                     if (chck === true) {
                         return {
                             success: chck,
-                            data: resultData
+                            data: result
                         };
                     }
                     else {
@@ -587,8 +583,14 @@ export class UserService {
     searchTerm(term: any): CRUDReturn {
         var resultData: Array<any> = [];
 
+        console.log('d')
+        var result = this.DB.collection("users").doc(term).get();
+
+        console.log(result)
         for (const user of this.users.values()) {
+            console.log('hello')
             if (user.retTermResult(term)) {
+                console.log(user)
                 resultData.push(user.toJson());
             }
         }
