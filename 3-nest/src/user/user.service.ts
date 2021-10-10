@@ -276,7 +276,7 @@ export class UserService {
     */
     async replaceInfoByID(id: string, body: any): Promise<CRUDReturn> {
         var chck: boolean;
-        let newUser: User;
+        // let newUser: User;
         var dbData: {};
         try {
             chck = await this.searchID(id);
@@ -293,13 +293,33 @@ export class UserService {
                     console.log('d' + body.email)
                     console.log(chck)
                     if (chck === true) {
-                        var user: User = this.users.get(id);
-                        var success = await user.modify(body);
-                        if (success)
-                            return {
-                                success: success,
-                                data: user.toJson(),
-                            };
+                        // var user: User = this.users.get(id);
+                        // console.log(user + ' user')
+                        var success = this.modify(body);
+                        if (success) {
+                            var newUser: User = new User(
+                                body?.name,
+                                body?.age,
+                                body?.email,
+                                body?.password,
+                                id);
+                            chck = await this.saveToDataBase(newUser);
+                            if (chck === true) {
+                                console.log('nisud?')
+                                if (chck === true) {
+                                    return {
+                                        success: true,
+                                        data: newUser.toJson()
+                                    };
+                                } else {
+                                    throw new Error("Generic Database Error!")
+                                }
+                            }
+                            else {
+                                console.log('1 ' + id);
+                                throw new Error(`Failed to update user in database`);
+                            }
+                        }
                         else {
                             throw new Error('Failed to update user in db');
                         }
@@ -322,6 +342,7 @@ export class UserService {
             }
         }
     }
+    
 
 
     /*
@@ -378,6 +399,22 @@ export class UserService {
             }
         }
     }
+
+    modify(body: any): boolean {
+        try {
+            var keys: Array<string> = Helper.describeClass(User);
+            keys = Helper.removeItemOnce(keys, 'id');
+            for (const key of Object.keys(body)) {
+                this[key] = body[key];
+                console.log('key: ' + this[key] + ' Body.key: ' + body[key])
+            }
+            return true;
+        } catch (error) {
+            console.log(error);
+            return false;
+        }
+    }
+
 
     async searchID(id: string): Promise<boolean> {
         var chck: boolean;

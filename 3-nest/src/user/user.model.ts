@@ -42,6 +42,8 @@ export class User {
         }
     }
 
+    
+
     /*
         Returns: If User exist in Firestore,
                     returns User Database
@@ -95,7 +97,7 @@ export class User {
         }
     }
 
-    async modify(body: any): Promise<boolean> {
+    modify(body: any): boolean {
         // // body.commitDB()
         // if (body.id != null)
         //     this.id = body.id;
