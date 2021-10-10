@@ -238,12 +238,13 @@ export class UserService {
                 console.log('t')
                 var dbData: {};
                 // for (const [key, user] of this.users.entries()) {
-                chck = await User.validateID(id);
-                if (chck === false) {
+                // chck = await User.validateID(id);
+                // if (chck === false) {
                     console.log(`Break : ${chck}`)
                     dbData = await User.retrieveDB(id);
+                    console.log(dbData)
                     // break;
-                }
+                // }
                 // }
                 return {
                     success: chck,
