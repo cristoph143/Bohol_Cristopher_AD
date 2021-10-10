@@ -240,10 +240,10 @@ export class UserService {
                 // for (const [key, user] of this.users.entries()) {
                 // chck = await User.validateID(id);
                 // if (chck === false) {
-                    console.log(`Break : ${chck}`)
-                    dbData = await User.retrieveDB(id);
-                    console.log(dbData)
-                    // break;
+                console.log(`Break : ${chck}`)
+                dbData = await User.retrieveDB(id);
+                console.log(dbData)
+                // break;
                 // }
                 // }
                 return {
@@ -343,7 +343,6 @@ export class UserService {
             }
         }
     }
-    
 
 
     /*
@@ -355,7 +354,7 @@ export class UserService {
     */
     async replaceInfoByID2(id: string, body: any): Promise<CRUDReturn> {
         var chck: boolean;
-        let newUser: User;
+        // let newUser: User;
         try {
             chck = await this.searchID(id);
 
@@ -365,17 +364,18 @@ export class UserService {
                     data: string
                 } = Helper.validBody(body);
                 if (validBody.valid) {
-                    for (const user of this.users.values()) {
-                        chck = await User.validationEmail(body.email);
-                        if (chck === false) break; //Exist
-                    }
+                    // for (const user of this.users.values()) {
+                    chck = await User.validationEmail(body.email);
+                    // if (chck === false) break; //Exist
+                    // }
                     if (chck === true) { // Not Exist
-                        var user: User = this.users.get(id);
-                        var success = await user.modify(body);
+                        // var user: User = this.users.get(id);
+                        var success = this.modify(body);
                         if (success) {
+                            var result = await this.DB.collection("users").doc(id).update(body);
                             return {
                                 success: success,
-                                data: user.toJson()
+                                data: `User ${body.id} has been deleted successfully!`
                             };
                         }
                         else {
@@ -400,6 +400,54 @@ export class UserService {
             }
         }
     }
+
+    // async replaceInfoByID2(id: string, body: any): Promise<CRUDReturn> {
+    //     var chck: boolean;
+    //     let newUser: User;
+    //     try {
+    //         chck = await this.searchID(id);
+
+    //         if (chck === true) {
+    //             var validBody: {
+    //                 valid: boolean;
+    //                 data: string
+    //             } = Helper.validBody(body);
+    //             if (validBody.valid) {
+    //                 for (const user of this.users.values()) {
+    //                     chck = await User.validationEmail(body.email);
+    //                     if (chck === false) break; //Exist
+    //                 }
+    //                 if (chck === true) { // Not Exist
+    //                     var user: User = this.users.get(id);
+    //                     var success = await user.modify(body);
+    //                     if (success) {
+    //                         return {
+    //                             success: success,
+    //                             data: user.toJson()
+    //                         };
+    //                     }
+    //                     else {
+    //                         throw new Error(`Failed to update user in database`);
+    //                     }
+    //                 }
+    //                 else {
+    //                     throw new Error(`${body.email} is already in use by another user!`);
+    //                 }
+    //             }
+    //             else {
+    //                 throw new Error(validBody.data);
+    //             }
+    //         }
+    //         else {
+    //             throw new Error(`User ${id} is not in the database`);
+    //         }
+    //     } catch (error) {
+    //         return {
+    //             success: false,
+    //             data: error.message
+    //         }
+    //     }
+    // }
 
     modify(body: any): boolean {
         try {
@@ -443,6 +491,8 @@ export class UserService {
         // try {
         let chck = await this.searchID(id);
         if (chck === true) {
+            
+            var result = await this.DB.collection("users").doc(id).delete();
             // for (const [key, user] of this.users.entries()) {
             //     const id: string = user['id']
             //     const name: string = user['name'];
@@ -486,10 +536,10 @@ export class UserService {
                 data: string
             } = Helper.validBody(body);
             if (validBody.valid) {
-                for (const [key, user] of this.users.entries()) {
+                // for (const [key, user] of this.users.entries()) {
                     chck = await User.validationEmail(body.email);
-                    if (chck === false) break;
-                }
+                    // if (chck === false) break;
+                // }
                 if (chck === false) {
                     for (const [key, user] of this.users.entries()) {
                         if (user.login(body.email, body.password)) {
