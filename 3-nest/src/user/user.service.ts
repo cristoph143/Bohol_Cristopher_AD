@@ -533,26 +533,28 @@ export class UserService {
                 // if (chck === false) break;
                 // }
                 if (chck === false) {
-                    var result = this.DB.collection("users").where("email", "==", body.email).where("password", "==",body.password);
+                    var result = this.DB.collection("users").where("email", "==", body.email).where("password", "==", body.password);
                     // console.log(result);
                     // resultData = await User.retrieveDB
                     // for (const [key, user] of this.users.entries()) {
-                        chck = await User.login(body.email, body.password);
-                        if (chck === true) {
-                            // const ID: string = user['id']
-                            // const name: string = user['name'];
-                            // const age: number = user['age'];
-                            // const email: string = user['email'];
-                            // resultData = {
-                            //     ID, name, age, email
-                            // };
-                            chck = true;
-                        }
-                    // }
+                    chck = await User.login(body.email, body.password);
+                    // if (chck === true) {
+                    var user = await this.loginCred(body.email, body.password);
+
+                    console.log(user)
+                    var keys: Array<string> = Helper.describeClass(User);
+                    // keys = Helper.removeItemOnce(keys, 'password');
+                    // console.log(keys)
+                    for (const key of Object.keys(result)) {
+                        this[key] = result[key];
+                    }
+                    console.log('result1 ' + result);
+
+                    // delete result.password;
                     if (chck === true) {
                         return {
                             success: chck,
-                            data: result
+                            data: user.pop()
                         };
                     }
                     else {
@@ -576,27 +578,123 @@ export class UserService {
         }
     }
 
+
+    async loginCred(email: string, password: string) {
+
+        var result: Array<User> = [];
+        try {
+            var DB = admin.firestore();//connect to database
+            var dbData: FirebaseFirestore.QuerySnapshot<FirebaseFirestore.DocumentData> = await this.DB.collection("users").where('email', '==', email).where('password', '==', password).get();
+            dbData.forEach((doc) => {
+                if (doc.exists) {
+                    var data = doc.data();
+                    result.push(new User(
+                        data["name"], data["age"], data["email"], data["password"], data["id"]
+                    ))
+                }
+            });
+
+            return result;
+            // var user;
+            // result.forEach((doc) => {
+            //     user = new user.User(doc.data());
+            // });
+            // return user;
+        }
+        catch (error) {
+            console.log(error);
+        }
+    }
+
     /*
         TODO: retrieves a user's data
         FIXME: Fails if the parameter id does not match any users in the database
     */
-    searchTerm(term: any): CRUDReturn {
-        var resultData: Array<any> = [];
-
-        console.log('d')
-        var result = this.DB.collection("users").doc(term).get();
-
-        console.log(result)
-        for (const user of this.users.values()) {
-            console.log('hello')
-            if (user.retTermResult(term)) {
-                console.log(user)
-                resultData.push(user.toJson());
+    async searchTerm(term: any): Promise<CRUDReturn> {
+        //     try {
+                
+        //         var dbData = await this.DB.collection("users").get();
+                var result: Array<User> = [];
+        //         dbData.forEach((doc) => {
+        //             var user = dbData;
+        //             console.log(user)
+        //             for (var keys in doc.data())
+        //                 if (user[keys] == term) {
+        //                     var id = user[id];
+        //                     // result.push(user);
+        //                     console.log(id)
+        //                 }
+        //         });
+        //         console.log(result)
+        //         return {
+        //             success: true,
+        //             data: result
+        //         };
+        //     }
+        //     catch (error) {
+        //         console.log(error);
+        //         return {
+        //             success: false,
+        //             data: error 
+        //         }
+        //     }
+        // }
+        
+        try {
+            var DB = admin.firestore();//connect to database
+            var dbData: FirebaseFirestore.QuerySnapshot<FirebaseFirestore.DocumentData> = await this.DB.collection("users").where('users', 'array-contains', term).get();
+            
+            var keys: Array<string> = Helper.describeClass(User);
+            for (const key of Object.keys(result)) {
+                this[key] = result[key];
+            }
+            console.log()
+            dbData.forEach((doc) => {
+                if (doc.exists) {
+                    var data = doc.data();
+                    // if(User[key] === term)
+                    result.push(new User(
+                        data["name"], data["age"], data["email"], data["password"], data["id"]
+                    ))
+                }
+                else{
+                    result = [];
+                }
+            });
+            console.log('result1 ' + result);
+            return {
+                success: true,
+                data: result
+            }
+            // var user;
+            // result.forEach((doc) => {
+            //     user = new user.User(doc.data());
+            // });
+            // return user;
+        }
+        catch (error) {
+            console.log(error);
+            return {
+                success: false,
+                data: error
             }
         }
-        return {
-            success: resultData.length > 0,
-            data: resultData
-        };
     }
+        // var resultData: Array<any> = [];
+
+        // console.log('d')
+        // var result = this.DB.collection("users").doc(term).get();
+
+        // console.log(result)
+        // for (const user of this.users.values()) {
+        //     console.log('hello')
+        //     if (user.retTermResult(term)) {
+        //         console.log(user)
+        //         resultData.push(user.toJson());
+        //     }
+        // }
+        // return {
+        //     success: resultData.length > 0,
+        //     data: resultData
+        // };
 }

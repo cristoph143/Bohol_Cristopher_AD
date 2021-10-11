@@ -42,7 +42,7 @@ export class User {
         }
     }
 
-    
+
 
     /*
         Returns: If User exist in Firestore,
@@ -115,11 +115,11 @@ export class User {
 
 
         try {
-            var keys: Array<string> = Helper.describeClass(User);
             keys = Helper.removeItemOnce(keys, 'id');
             for (const key of Object.keys(body)) {
                 this[key] = body[key];
             }
+            var keys: Array<string> = Helper.describeClass(User);
             return true;
         } catch (error) {
             console.log(error);
@@ -244,10 +244,10 @@ export class User {
         return false;
     }
 
-    static async login(email: string, password: string) {
+    static async login(email: string, password: string): Promise<boolean> {
         // try {
         //     console.log('valid?')
-        
+
         var DB = admin.firestore();//connect to database
         var result = await DB.collection("users").where("email", "==", email).get();
 
@@ -255,6 +255,7 @@ export class User {
             console.log(`Empty Database!`);
             return false;
         }
+
         for (const doc of result.docs) {
             var data = doc.data();
             if (data["email"] === email && data["password"] === password) {
@@ -271,21 +272,22 @@ export class User {
         console.log('unsa')
         return false;
     }
-    // catch (error) {
-    //     console.log('email exist')
-    //     console.log(error.message);
-    //     return false;
-    // }
 
+    static async loginCred(email: string, password: string) {
 
-        // if (email === this.email && password === this.password) {
-        //     return true;
-        // }
-        // else {
-        //     return false;
-        // }
-    // }
-
+        try {
+            var DB = admin.firestore();//connect to database
+            var result = await DB.collection("users").where('email', '==', email).where('password', '==', password).get();
+            var user;
+            result.forEach((doc) => {
+                user = new user.User(doc.data());
+            });
+            return user;
+        }
+        catch (error) {
+            console.log(error);
+        }
+    }
 
     pri() {
         console.log(`DID: ${this.id}\nName: ${this.name}\nAge: ${this.age}\nEmail: ${this.email}\nPassword: ${this.password}\n---End---\n`);
