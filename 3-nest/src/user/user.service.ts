@@ -10,8 +10,9 @@ export class UserService {
     private DB = admin.firestore();
 
     // constructor() {
-    //     // this. = Helper.populate();
-    //     this.populate();
+    // //     // this. = Helper.populate();
+    // //     this.populate();
+
     // }
 
     /* 
@@ -32,11 +33,8 @@ export class UserService {
             } = Helper.validBodyPut(body);
 
             if (validBody.valid) {
-                for (const user of this.users.values()) {
-                    chck = await user.validationEmail(body.email);
-                    if (chck === false) break;
-                }
                 console.log(chck);
+                chck = await User.validationEmail(body.email);
                 if (chck === true) {
                     var id: string = Helper.generateUID();
                     var newUser: User = new User(
@@ -44,25 +42,10 @@ export class UserService {
                         body?.age,
                         body?.email,
                         body?.password);
-                    console.log("id: " + newUser.id);
-                    if (this.saveToDataBase(newUser)) {
+                    console.log("id: " + id);
+                    chck = await this.saveToDataBase(newUser);
+                    if (chck === true) {
                         console.log('nisud?')
-                        var resultData: {};
-                        for (const user of this.users.values()) {
-                            chck = await user.validateID(user.id);
-                            if (chck === true) {
-                                // const id: string = user['id'];
-                                // const name: string = user['name'];
-                                // const age: number = user['age'];
-                                // const email: string = user['email'];
-                                // resultData = {
-                                //     id, name, age, email
-                                // };
-                                // console.log('sss');
-                                // chck = true;
-                                break;
-                            }
-                        }
                         if (chck === true) {
                             return {
                                 success: true,
@@ -73,7 +56,7 @@ export class UserService {
                         }
                     }
                     else {
-                        console.log('1 ' + body.id);
+                        console.log('1 ' + id);
                         throw new Error(`Failed to update user in database`);
                     }
                 }
@@ -100,10 +83,6 @@ export class UserService {
             var result = await body.commitDB();
             console.log(result + ' save?');
             return result.success;
-            // console.log(body.id + ' 4');
-            // var chck = this.users.has(body.id);
-            // console.log('Save to db: chck' + chck)
-            // return chck;
         }
         catch (error) {
             console.log(error)
@@ -131,6 +110,40 @@ export class UserService {
     //         return false;
     //     }
     // }
+
+    async validationEmail(email: string, options?: { exceptionId: string }): Promise<boolean> {
+        try {
+            console.log('valid?')
+            var DB = admin.firestore();//connect to database
+            var result = await DB.collection("users").where("email", "==", email).get();
+            if (result.empty) {
+                console.log(`Empty Database!`);
+                return true;
+            }
+            for (const doc of result.docs) {
+                var data = doc.data();
+                if (options != undefined) {
+                    if (doc.id === options?.exceptionId) {
+                        continue;
+                    }
+                }
+                if (doc.data()["email"] === email) {
+                    console.log(`${email} === ${data.email} exist`);
+                    return false;
+                }
+                else {
+                    console.log(`${email} !== ${data.email} exist`);
+                    return true;
+                }
+            }
+            return true;
+        }
+        catch (error) {
+            console.log('email exist')
+            console.log(error.message);
+            return false;
+        }
+    }
 
     /*
         TODO:
@@ -173,7 +186,7 @@ export class UserService {
                     ))
                 }
             });
-            console.log('result1 '+result);
+            console.log('result1 ' + result);
             return result;
             // for (const user of this.users.values())
             //     populatedData.push(user.toJson());
@@ -224,14 +237,15 @@ export class UserService {
             if (chck === true) {
                 console.log('t')
                 var dbData: {};
-                for (const [key, user] of this.users.entries()) {
-                    chck = await user.validateID(id);
-                    if (chck === false) {
-                        console.log(`Break : ${chck}`)
-                        dbData = await user.retrieveDB(id);
-                        break;
-                    }
-                }
+                // for (const [key, user] of this.users.entries()) {
+                // chck = await User.validateID(id);
+                // if (chck === false) {
+                console.log(`Break : ${chck}`)
+                dbData = await User.retrieveDB(id);
+                console.log(dbData)
+                // break;
+                // }
+                // }
                 return {
                     success: chck,
                     data: dbData
@@ -263,31 +277,52 @@ export class UserService {
     */
     async replaceInfoByID(id: string, body: any): Promise<CRUDReturn> {
         var chck: boolean;
-        let newUser: User;
+        // let newUser: User;
+        var dbData: {};
         try {
             chck = await this.searchID(id);
-
+            console.log(chck)
             if (chck === true) {
+                console.log(chck)
                 var validBodyPut: {
                     valid: boolean;
                     data: string
                 } = Helper.validBodyPut(body);
                 if (validBodyPut.valid) {
-                    for (const user of this.users.values()) {
-                        chck = await user.validationEmail(body.email);
-                        if (chck === false) break;
-                    }
+                    console.log('h')
+                    chck = await User.validationEmail(body.email);
+                    console.log('d' + body.email)
+                    console.log(chck)
                     if (chck === true) {
-                        var user: User = this.users.get(id);
-                        var success = user.modify(body);
+                        // var user: User = this.users.get(id);
+                        // console.log(user + ' user')
+                        var success = this.modify(body);
                         if (success) {
-                            return {
-                                success: success,
-                                data: user.toJson()
-                            };
+                            var newUser: User = new User(
+                                body?.name,
+                                body?.age,
+                                body?.email,
+                                body?.password,
+                                id);
+                            chck = await this.saveToDataBase(newUser);
+                            if (chck === true) {
+                                console.log('nisud?')
+                                if (chck === true) {
+                                    return {
+                                        success: true,
+                                        data: newUser.toJson()
+                                    };
+                                } else {
+                                    throw new Error("Generic Database Error!")
+                                }
+                            }
+                            else {
+                                console.log('1 ' + id);
+                                throw new Error(`Failed to update user in database`);
+                            }
                         }
                         else {
-                            throw new Error(`Failed to update user in database`);
+                            throw new Error('Failed to update user in db');
                         }
                     }
                     else {
@@ -319,7 +354,7 @@ export class UserService {
     */
     async replaceInfoByID2(id: string, body: any): Promise<CRUDReturn> {
         var chck: boolean;
-        let newUser: User;
+        // let newUser: User;
         try {
             chck = await this.searchID(id);
 
@@ -329,17 +364,18 @@ export class UserService {
                     data: string
                 } = Helper.validBody(body);
                 if (validBody.valid) {
-                    for (const user of this.users.values()) {
-                        chck = await user.validationEmail(body.email);
-                        if (chck === false) break; //Exist
-                    }
+                    // for (const user of this.users.values()) {
+                    chck = await User.validationEmail(body.email);
+                    // if (chck === false) break; //Exist
+                    // }
                     if (chck === true) { // Not Exist
-                        var user: User = this.users.get(id);
-                        var success = user.modify(body);
+                        // var user: User = this.users.get(id);
+                        var success = this.modify(body);
                         if (success) {
+                            var result = await this.DB.collection("users").doc(id).update(body);
                             return {
                                 success: success,
-                                data: user.toJson()
+                                data: `User ${body.id} has been deleted successfully!`
                             };
                         }
                         else {
@@ -365,16 +401,80 @@ export class UserService {
         }
     }
 
+    // async replaceInfoByID2(id: string, body: any): Promise<CRUDReturn> {
+    //     var chck: boolean;
+    //     let newUser: User;
+    //     try {
+    //         chck = await this.searchID(id);
+
+    //         if (chck === true) {
+    //             var validBody: {
+    //                 valid: boolean;
+    //                 data: string
+    //             } = Helper.validBody(body);
+    //             if (validBody.valid) {
+    //                 for (const user of this.users.values()) {
+    //                     chck = await User.validationEmail(body.email);
+    //                     if (chck === false) break; //Exist
+    //                 }
+    //                 if (chck === true) { // Not Exist
+    //                     var user: User = this.users.get(id);
+    //                     var success = await user.modify(body);
+    //                     if (success) {
+    //                         return {
+    //                             success: success,
+    //                             data: user.toJson()
+    //                         };
+    //                     }
+    //                     else {
+    //                         throw new Error(`Failed to update user in database`);
+    //                     }
+    //                 }
+    //                 else {
+    //                     throw new Error(`${body.email} is already in use by another user!`);
+    //                 }
+    //             }
+    //             else {
+    //                 throw new Error(validBody.data);
+    //             }
+    //         }
+    //         else {
+    //             throw new Error(`User ${id} is not in the database`);
+    //         }
+    //     } catch (error) {
+    //         return {
+    //             success: false,
+    //             data: error.message
+    //         }
+    //     }
+    // }
+
+    modify(body: any): boolean {
+        try {
+            var keys: Array<string> = Helper.describeClass(User);
+            keys = Helper.removeItemOnce(keys, 'id');
+            for (const key of Object.keys(body)) {
+                this[key] = body[key];
+                console.log('key: ' + this[key] + ' Body.key: ' + body[key])
+            }
+            return true;
+        } catch (error) {
+            console.log(error);
+            return false;
+        }
+    }
+
+
     async searchID(id: string): Promise<boolean> {
         var chck: boolean;
-        for (const [key, user] of this.users.entries()) {
-            chck = await user.validateID(id);
-            if (chck === false) {
-                console.log(`Break : ${chck}`)
-                chck = true;
-                break;
-            }
+        // for (const [key, user] of this.users.entries()) {
+        chck = await User.validateID(id);
+        if (chck === false) {
+            console.log(`Break : ${chck}`)
+            chck = true;
+            // break;
         }
+        // }
         return chck;
     }
 
@@ -388,36 +488,29 @@ export class UserService {
     */
     async deleteProfile(id: string): Promise<CRUDReturn> {
         var resultData: {};
-        // try {
-        let chck = await this.searchID(id);
-        if (chck === true) {
-            // for (const [key, user] of this.users.entries()) {
-            //     const id: string = user['id']
-            //     const name: string = user['name'];
-            //     const age: number = user['age'];
-            //     const email: string = user['email'];
-            //     resultData = {
-            //         id, name, age, email
-            //     };
-            // }
-            this.users.delete(id);
-            return {
-                success: true,
-                data: `${id} has been successfully removed`
-            };
-        }
-        else {
+        try {
+            let chck = await this.searchID(id);
+            if (chck === true) {
+
+                var result = await this.DB.collection("users").doc(id).delete();
+                this.users.delete(id);
+                return {
+                    success: true,
+                    data: `${id} has been successfully removed`
+                };
+            }
+            else {
+                return {
+                    success: false,
+                    data: `Id ${id} has not been found in the database!`
+                };
+            }
+        } catch (error) {
             return {
                 success: false,
-                data: `Id ${id} has not been found in the database!`
+                data: error.message
             };
         }
-        // } catch (error) {
-        //     return {
-        //         success: false,
-        //         data: error.message
-        //     };
-        // }
     }
 
     lines() {
@@ -434,27 +527,34 @@ export class UserService {
                 data: string
             } = Helper.validBody(body);
             if (validBody.valid) {
-                for (const [key, user] of this.users.entries()) {
-                    chck = await user.validationEmail(body.email);
-                    if (chck === false) break;
-                }
+                // for (const [key, user] of this.users.entries()) {
+                chck = await User.validationEmail(body.email);
+                console.log(chck)
+                // if (chck === false) break;
+                // }
                 if (chck === false) {
-                    for (const [key, user] of this.users.entries()) {
-                        if (user.login(body.email, body.password)) {
-                            const ID: string = user['id']
-                            const name: string = user['name'];
-                            const age: number = user['age'];
-                            const email: string = user['email'];
-                            resultData = {
-                                ID, name, age, email
-                            };
-                            chck = true;
-                        }
+                    var result = this.DB.collection("users").where("email", "==", body.email).where("password", "==", body.password);
+                    // console.log(result);
+                    // resultData = await User.retrieveDB
+                    // for (const [key, user] of this.users.entries()) {
+                    chck = await User.login(body.email, body.password);
+                    // if (chck === true) {
+                    var user = await this.loginCred(body.email, body.password);
+
+                    console.log(user)
+                    var keys: Array<string> = Helper.describeClass(User);
+                    // keys = Helper.removeItemOnce(keys, 'password');
+                    // console.log(keys)
+                    for (const key of Object.keys(result)) {
+                        this[key] = result[key];
                     }
+                    console.log('result1 ' + result);
+
+                    // delete result.password;
                     if (chck === true) {
                         return {
                             success: chck,
-                            data: resultData
+                            data: user.pop()
                         };
                     }
                     else {
@@ -478,21 +578,123 @@ export class UserService {
         }
     }
 
+
+    async loginCred(email: string, password: string) {
+
+        var result: Array<User> = [];
+        try {
+            var DB = admin.firestore();//connect to database
+            var dbData: FirebaseFirestore.QuerySnapshot<FirebaseFirestore.DocumentData> = await this.DB.collection("users").where('email', '==', email).where('password', '==', password).get();
+            dbData.forEach((doc) => {
+                if (doc.exists) {
+                    var data = doc.data();
+                    result.push(new User(
+                        data["name"], data["age"], data["email"], data["password"], data["id"]
+                    ))
+                }
+            });
+
+            return result;
+            // var user;
+            // result.forEach((doc) => {
+            //     user = new user.User(doc.data());
+            // });
+            // return user;
+        }
+        catch (error) {
+            console.log(error);
+        }
+    }
+
     /*
         TODO: retrieves a user's data
         FIXME: Fails if the parameter id does not match any users in the database
     */
-    searchTerm(term: any): CRUDReturn {
-        var resultData: Array<any> = [];
-
-        for (const user of this.users.values()) {
-            if (user.retTermResult(term)) {
-                resultData.push(user.toJson());
+    async searchTerm(term: any): Promise<CRUDReturn> {
+        //     try {
+                
+        //         var dbData = await this.DB.collection("users").get();
+                var result: Array<User> = [];
+        //         dbData.forEach((doc) => {
+        //             var user = dbData;
+        //             console.log(user)
+        //             for (var keys in doc.data())
+        //                 if (user[keys] == term) {
+        //                     var id = user[id];
+        //                     // result.push(user);
+        //                     console.log(id)
+        //                 }
+        //         });
+        //         console.log(result)
+        //         return {
+        //             success: true,
+        //             data: result
+        //         };
+        //     }
+        //     catch (error) {
+        //         console.log(error);
+        //         return {
+        //             success: false,
+        //             data: error 
+        //         }
+        //     }
+        // }
+        
+        try {
+            var DB = admin.firestore();//connect to database
+            var dbData: FirebaseFirestore.QuerySnapshot<FirebaseFirestore.DocumentData> = await this.DB.collection("users").where('users', 'array-contains', term).get();
+            
+            var keys: Array<string> = Helper.describeClass(User);
+            for (const key of Object.keys(result)) {
+                this[key] = result[key];
+            }
+            console.log()
+            dbData.forEach((doc) => {
+                if (doc.exists) {
+                    var data = doc.data();
+                    // if(User[key] === term)
+                    result.push(new User(
+                        data["name"], data["age"], data["email"], data["password"], data["id"]
+                    ))
+                }
+                else{
+                    result = [];
+                }
+            });
+            console.log('result1 ' + result);
+            return {
+                success: true,
+                data: result
+            }
+            // var user;
+            // result.forEach((doc) => {
+            //     user = new user.User(doc.data());
+            // });
+            // return user;
+        }
+        catch (error) {
+            console.log(error);
+            return {
+                success: false,
+                data: error
             }
         }
-        return {
-            success: resultData.length > 0,
-            data: resultData
-        };
     }
+        // var resultData: Array<any> = [];
+
+        // console.log('d')
+        // var result = this.DB.collection("users").doc(term).get();
+
+        // console.log(result)
+        // for (const user of this.users.values()) {
+        //     console.log('hello')
+        //     if (user.retTermResult(term)) {
+        //         console.log(user)
+        //         resultData.push(user.toJson());
+        //     }
+        // }
+        // return {
+        //     success: resultData.length > 0,
+        //     data: resultData
+        // };
 }
