@@ -3,6 +3,9 @@
 3-nest/node_modules
 4-Portal/node_modules
 new-keys.json
+4-Portal/.browserslist
+4-Portal/editorconfig
+
 # Logs
 logs
 *.log
