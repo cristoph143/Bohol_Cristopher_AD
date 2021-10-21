@@ -4,12 +4,11 @@
         <form action="index.html">
             <div class="control">
                 <label for="email" class="shadows">Email</label>
-                <input type="email" formControl="fCEmail">
-                <span>Helo</span>
+                <input type="email" [formControl]="fCEmail">
             </div>
             <div class="control">
                 <label for="psw" class="shadows">Password</label>
-                <input type="password" formControl="fCPassword">
+                <input type="password" [formControl]="fCPassword">
             </div>
             <span><input type="checkbox"> Remember me</span>
             <div class="control">
