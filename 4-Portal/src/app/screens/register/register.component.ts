@@ -20,7 +20,6 @@ export class RegisterComponent implements OnInit {
     fcName: new FormControl('', Validators.required),
     fcAge: new FormControl(0, [
         Validators.required,
-        Validators.minLength(2), 
         Validators.min(18), 
         Validators.max(65)
       ]),
@@ -58,17 +57,18 @@ export class RegisterComponent implements OnInit {
 
 
   onSubmit() {
-    alert('sdsds')
     if (
       this.registerForm.value['fcPassword'] !==
       this.registerForm.value['fcPassword2']
     ) {
       this.error = 'Password doesnt match!';
+      alert(this.error);
       return;
     }
     if (!this.registerForm.valid) {
       {
         this.error = 'No fields must be empty';
+        alert(this.error);
         return;
       }
     }
@@ -87,7 +87,7 @@ export class RegisterComponent implements OnInit {
       };
       console.log(payload);
       alert('Hellow')
-      // this.register();
+      this.register();
     }
   }
 
