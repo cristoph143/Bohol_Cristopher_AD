@@ -19,7 +19,7 @@
             </div>
             <div class="control">
                 <label for="psw" class="txt shadows">Password</label>
-                <input type="password" name="password1" placeholder="*********" id="password" formControlName="fcPassword" required>
+                <input type="password" name="password1" placeholder="*********" id="password" formControlName="fcPassword" pattern='^(?=.*[0-9])(?=.*[a-zA-Z])([a-zA-Z0-9]+)$' minlength="5" maxlength="20" required>
             </div>
             <div class="control">
                 <label for="psw" class="txt shadows">Confirm Password</label>
@@ -28,11 +28,11 @@
             <span class="txt shadows">
                 <input type="checkbox" class="txt shadows"> Remember me
             </span>
-        </form>
         <div class="control">
             <button type="submit" class="button" [disabled]="!registerForm.valid">Register</button>
             <button type="submit" class="button" (click)="nav('login')">Log In</button>
         </div>
+        </form>
         <p><a href="#" class="shadows">Forget password ?</a></p>
     </div>
 </section>
