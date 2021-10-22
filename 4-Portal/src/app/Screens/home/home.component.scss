@@ -10,6 +10,7 @@ body {
   background-position-x: right;
   background-position-y: 86px;
   background-attachment: fixed;
+  scroll-behavior: smooth;
 }
 
 .site-header {
@@ -97,39 +98,6 @@ body {
   }
 }
 
-.banner-image {
-  height: 720px;
-  position: relative;
-  background-image: url("../../../assets/banner_tirxkp.jpg");
-  background-size: cover;
-  background-attachment: fixed;
-}
-
-.banner-attribution {
-  display: inline-block;
-  padding: 8px 16px;
-  margin: 0;
-  position: absolute;
-  left: 16px;
-  bottom: 0;
-  font-size: 14px;
-  line-height: 16px;
-  color: #ffffff;
-  background-color: #1f2937;
-  a {
-    font-weight: bold;
-    text-decoration: none;
-    color: #ffffff;
-
-    transition-property: color;
-    transition-duration: 200ms;
-    &:hover,
-    &:focus {
-      color: #f59e0b;
-    }
-  }
-}
-
 .section {
   max-width: 760px;
   padding: 150px 24px;
@@ -153,55 +121,22 @@ body {
       color: #f59e0b;
     }
   }
-}
-
-.about-section {
-  h2 {
-    display: none;
-  }
-  p:first-of-type {
-    margin-top: 0;
-  }
-  p:last-of-type {
-    margin-bottom: 0;
+  user_list-section {
+    h2 {
+      display: none;
+    }
+    p:first-of-type {
+      margin-top: 0;
+    }
+    p:last-of-type {
+      margin-bottom: 0;
+    }
   }
 }
 
 .shadows {
   text-shadow: 0.025em 0.025em 0 yellow, 0.045em 0.045em 0 blue,
     0.075em 0.075em 0 red, 0.1em 0.1em 0 black;
-}
-
-.education {
-  padding: 32px 42px;
-  border-radius: 5px;
-
-  background-color: #f9fafb;
-  padding: 50px 30px;
-  border-radius: 10px;
-  box-shadow: 7px 7px 60px #000;
-  &:not(:last-child) {
-    margin-bottom: 32px;
-  }
-}
-
-.school {
-  margin: 0;
-
-  font-size: 18px;
-  font-weight: normal;
-  line-height: 28px;
-  p:last-child {
-    margin-bottom: 0;
-  }
-}
-
-.year_graduated {
-  margin: 0;
-
-  font-size: 14px;
-  line-height: 24px;
-  color: #4b5563;
 }
 
 .contact-section {

@@ -1,1 +1,38 @@
-<p>register works!</p>
+<section>
+    <div class="form-container">
+        <h1 class="shadows">Registration Form</h1>
+        <!-- <p>{{ error }}</p>
+        <p>{{ registerForm.value | json }}</p> -->
+        <p>{{ registerForm.status }}</p>
+        <form class="inputs" [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+            <div class="control">
+                <label for="Name" class="txt shadows">Name</label>
+                <input type="text" name="name" placeholder="Full Name" id="name" autocomplete="on" formControlName="fcName" required>
+            </div>
+            <div class="control">
+                <label for="Age" class="txt shadows">Age</label>
+                <input type="number" name="age" placeholder="Age" id="age" formControlName="fcAge" required>
+            </div>
+            <div class="control">
+                <label for="email" class="txt shadows">Email</label>
+                <input type="email" name="email" placeholder="Email@gmail.com" id="email" autocomplete="on" formControlName="fcEmail" required>
+            </div>
+            <div class="control">
+                <label for="psw" class="txt shadows">Password</label>
+                <input type="password" name="password1" placeholder="*********" id="password" formControlName="fcPassword" required>
+            </div>
+            <div class="control">
+                <label for="psw" class="txt shadows">Confirm Password</label>
+                <input type="password" name="password2" placeholder="*********" id="password" formControlName="fcPassword2" required>
+            </div>
+            <span class="txt shadows">
+                <input type="checkbox" class="txt shadows"> Remember me
+            </span>
+        </form>
+        <div class="control">
+            <button type="submit" class="button" [disabled]="!registerForm.valid">Register</button>
+            <button type="submit" class="button" (click)="nav('login')">Log In</button>
+        </div>
+        <p><a href="#" class="shadows">Forget password ?</a></p>
+    </div>
+</section>
