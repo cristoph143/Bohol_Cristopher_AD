@@ -9,49 +9,37 @@
 </header>
 
 <div class="intro-section">
-    <h1>Angular HTML Table Example</h1>
-    
-    <button type="button" class="button" (click)="displayUsers" >Edit</button>
-    <button type="button" class="button">Delete</button>
-    <!-- <br>
-    <table>
-        <thead>
-            <tr>
-                <th>#ID</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Age</th>
-                <th>Email</th>
-                <th>Password</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr *ngFor="let item of ItemsArray">
-                <th>{{ item.id }}</th>
-                <td>{{ item.name }}</td>
-                <td>{{ item.email }}</td>
-                <td>{{ item.phone}}</td>
-                <td>{{ item.address }}</td>
-                <td>
+    <h1>Angular HTML Table Example<br><br></h1>
+
+    <!-- <button type="button" class="button" (click)="displayUsers">Edit</button>
+    <button type="button" class="button">Delete</button> -->
+    <br>
+    <div style="overflow-x:auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>#ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Age</th>
+                    <th>Password</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let user of user1">
+                    <!-- <td>{{ user.id }}</td> -->
+                    <td>{{ user.name }}</td>
+                    <td>{{ user.age }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.password }}</td>
+                    <!-- <td>
                 <button type="button" >Edit</button>
                 <button type="button" >Delete</button>
-                </td>
-            </tr>
-        </tbody>
-        <tbody>
-            <tr >
-                <th>item.id</th>
-                <td>item.name</td>
-                <td>item.email</td>
-                <td>item.phon</td>
-                <td>item.address</td>
-                <td>
-                <button type="button" >Edit</button>
-                <button type="button" >Delete</button>
-                </td>
-            </tr>
-        </tbody>
-    </table> -->
+                </td> -->
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 
 
