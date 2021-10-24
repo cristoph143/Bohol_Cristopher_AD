@@ -14,16 +14,12 @@ export class HomeComponent implements OnInit {
 
   ngOnInit(): void {
   }
-  nav(destination: string) {
-    this.router.navigate([destination]);
-  }
-  ItemsArray = [];
 
   async displayUsers() {
     var result: any = await this.api
-      .get(environment.API_URL + '/user/getAll')
-      .toPromise();
+      .get(environment.API_URL + '/user/all').toPromise();
     console.log(result)
+    alert(result);
     if (result.success == true) {
       // this.nav('login');
       alert(result.toString());
@@ -32,6 +28,10 @@ export class HomeComponent implements OnInit {
     else {
       alert(result.data);
     }
+  }
+  
+  nav(destination: string) {
+    this.router.navigate([destination]);
   }
 
 }
