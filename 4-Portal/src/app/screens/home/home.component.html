@@ -1,47 +1,56 @@
 <header class="site-header">
     <div class="site-header-contents">
-    <a href="home" class="site-logo shadows">Cristopher Bohol</a>
+        <a href="home" class="site-logo shadows">Cristopher Bohol</a>
 
-    <nav class="site-nav">
-        <a href="home#user_list" class="shadows">User List</a>
-        <a href="home#contact" class="shadows">Contact</a>
-        <a routerLink="/login" class="shadows">SignOut</a>
-    </nav>
+        <nav class="site-nav">
+            <a routerLink="/login" class="shadows">SignOut</a>
+        </nav>
     </div>
 </header>
 
 <div class="intro-section">
-    <img src="../../../assets/profile.jpg" alt="A photo" width="250" height="250" />
-
-    <h1>
-        Hi, I am 
-        <span class="highlight-name">
-            Cristopher Bohol,
-        </span>
-        3rd Year Computer Science Student in
-        <span class="highlight-name">
-            University of San Jose Recoletos.
-        </span>
-    </h1>
+    <h1>Angular HTML Table Example</h1>
+    <br>
+    <table>
+        <thead>
+            <tr>
+                <th>#ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Age</th>
+                <th>Email</th>
+                <th>Password</th>
+            </tr>
+        </thead>
+        <!-- <tbody>
+            <tr *ngFor="let item of ItemsArray">
+                <th>{{ item.id }}</th>
+                <td>{{ item.name }}</td>
+                <td>{{ item.email }}</td>
+                <td>{{ item.phone}}</td>
+                <td>{{ item.address }}</td>
+                <td>
+                <button type="button" >Edit</button>
+                <button type="button" >Delete</button>
+                </td>
+            </tr>
+        </tbody> -->
+        <tbody>
+            <tr >
+                <th>item.id</th>
+                <td>item.name</td>
+                <td>item.email</td>
+                <td>item.phon</td>
+                <td>item.address</td>
+                <td>
+                <button type="button" >Edit</button>
+                <button type="button" >Delete</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 </div>
 
-<section id="user_list" class="section user_list-section">
-    <h2 class="shadows">User List</h2>
-
-    <p>
-    I am currently Thitd Year College student of University of San Jose Recoletos with a Bachelor Degree of <strong>Bachelor Science in Computer Science</strong>.
-    </p>
-    <p>
-    I'm passionate of getting a job that is related to my specified field in Computer Science.
-    </p>
-</section>
-
-<section id="contact" class="section contact-section">
-    <h2 class="shadows">Get in touch</h2>
-
-    <p>My inbox is always open for possible project collaborations or if you just want to say hi!</p>
-    <a href="mailto:cristopher.bohol.21@gmail.com" class="email-button">Send me an email</a>
-</section>
 
 <div class="social-links">
     <a href="https://facebook.com/microtoph.143" target="_blank" class="facebook">Facebook</a>
