@@ -80,62 +80,9 @@
     line-height: 48px;
     color: #4b5563;
   }
-}
+  border-spacing: 0;
 
-.section {
-  max-width: 760px;
-  padding: 150px 100px;
-  margin: 0 auto;
-  h2 {
-    margin-bottom: 42px;
-
-    font-size: 32px;
-    line-height: 42px;
-    text-align: center;
-    color: #4b5563;
-  }
-  a {
-    font-weight: bold;
-    color: #7c3aed;
-
-    transition-property: color;
-    transition-duration: 200ms;
-    &:hover,
-    &:focus {
-      color: #f59e0b;
-    }
-  }
-}
-
-.shadows {
-  text-shadow: 0.025em 0.025em 0 yellow, 0.045em 0.045em 0 blue,
-    0.075em 0.075em 0 red, 0.1em 0.1em 0 black;
-}
-
-.contact-section {
-  max-width: 712px;
-  padding-top: 56px;
-  padding-bottom: 56px;
-  margin-bottom: 150px;
-  border-radius: 5px;
-  text-align: center;
-  color: #ffffff;
-  background-image: linear-gradient(to bottom right, #8b5cf6, #5b21b6);
-  padding: 50px 30px;
-  border-radius: 10px;
-  box-shadow: 7px 7px 60px #000;
-  h2 {
-    margin-top: 0;
-    margin-bottom: 24px;
-
-    color: #ffffff;
-  }
-  p {
-    max-width: 500px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  .email-button {
+  button {
     display: inline-block;
     padding: 14px 42px;
     margin-top: 56px;
@@ -147,13 +94,30 @@
     background-color: #ffffff;
     transition-property: background-color, color;
     transition-duration: 200ms, 200ms;
+    border-color: #f9fafb;
+    &:hover,
+    &:focus {
+      color: #ffffff;
+      background-color: #f59e0b;
+    }
   }
 }
 
-.contact-section .email-button:hover,
-.contact-section .email-button:focus {
-  color: #ffffff;
-  background-color: #f59e0b;
+@media screen and (max-width: 500px) {
+  .secction {
+    padding: 70px 30px;
+  }
+}
+
+.section {
+  max-width: 760px;
+  padding: 150px 100px;
+  margin: 0 auto;
+}
+
+.shadows {
+  text-shadow: 0.025em 0.025em 0 yellow, 0.045em 0.045em 0 blue,
+    0.075em 0.075em 0 red, 0.1em 0.1em 0 black;
 }
 
 .social-links {
