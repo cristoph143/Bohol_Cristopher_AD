@@ -33,7 +33,12 @@ export class LoginComponent implements OnInit {
         password: this.fcPassword.value,
       })
       .toPromise();
+      var result1: any = await this.api
+      .get(environment.API_URL + '/user/all')
+      .toPromise();
     console.log(result)
+    console.log('d')
+    console.log(result1);
     if (result.success == true) {
       this.nav('home');
     }

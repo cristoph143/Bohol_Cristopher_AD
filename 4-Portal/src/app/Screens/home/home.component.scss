@@ -67,17 +67,16 @@
   align-items: left;
 
   max-width: 1000px;
-  padding: 0 24px;
   margin: 20px auto;
   margin-bottom: 0;
 
-  padding: 205px 110px;
+  padding: 145px 100px;
   border-radius: 10px;
   box-shadow: 7px 7px 60px #000;
   h1 {
-    margin: 0;
-    font-size: 40px;
-    line-height: 48px;
+    // margin: 30px;
+    // font-size: 40px;
+    // line-height: 48px;
     color: #4b5563;
   }
   border-spacing: 0;
@@ -101,11 +100,27 @@
       background-color: #f59e0b;
     }
   }
+  table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    width: 100%;
+    border: 1px solid #ddd;
+  }
+  
+  th, td {
+    text-align: left;
+    padding: 8px;
+  }
+  thead{
+    background-color: #f2f2f2;
+  }
+
+  tr:nth-child(even){background-color: #f2f2f2}
 }
 
-@media screen and (max-width: 500px) {
-  .secction {
-    padding: 70px 30px;
+@media screen and (max-width: 800px) {
+  .intro-section {
+    padding: 100px 30px;
   }
 }
 
