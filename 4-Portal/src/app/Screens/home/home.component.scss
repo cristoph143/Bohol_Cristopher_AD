@@ -16,8 +16,9 @@
   position: sticky;
   top: 0;
   z-index: 1;
-  // background-color: #ffffff;
-  background-color: #f9fafb;
+  background-color: #ffffff;
+  text-align: center;
+  border-radius: 10px;
 }
 
 .site-header-contents {
@@ -64,22 +65,18 @@
 
 .intro-section {
   display: flex;
-  align-items: left;
+  // max-height: 300px;
+  // margin: 20px auto;
+  // margin-bottom: 0;
 
-  max-width: 1000px;
-  margin: 20px auto;
-  margin-bottom: 0;
-
-  padding: 145px 100px;
+  margin: 10px;
+  height: 480px;
   border-radius: 10px;
-  box-shadow: 7px 7px 60px #000;
+  box-shadow: 7px 7px 60px crimson;
   h1 {
-    // margin: 30px;
-    // font-size: 40px;
-    // line-height: 48px;
     color: #4b5563;
   }
-  border-spacing: 0;
+  border-spacing: 2px;
 
   button {
     display: inline-block;
@@ -100,16 +97,19 @@
       background-color: #f59e0b;
     }
   }
+  
   table {
-    border-collapse: collapse;
     border-spacing: 0;
     width: 100%;
+    margin: 20px auto;
+    table-layout: auto;
     border: 1px solid #ddd;
   }
   
   th, td {
     text-align: left;
     padding: 8px;
+    border-collapse: collapse;
   }
   thead{
     background-color: #f2f2f2;
@@ -118,11 +118,13 @@
   tr:nth-child(even){background-color: #f2f2f2}
 }
 
-@media screen and (max-width: 800px) {
+/* Extra small devices (phones, 600px and down) */
+@media only screen and (max-width: 600px) {
   .intro-section {
-    padding: 100px 30px;
+    height: 495px;
   }
 }
+
 
 .section {
   max-width: 760px;
@@ -133,42 +135,6 @@
 .shadows {
   text-shadow: 0.025em 0.025em 0 yellow, 0.045em 0.045em 0 blue,
     0.075em 0.075em 0 red, 0.1em 0.1em 0 black;
-}
-
-.social-links {
-  width: 32px;
-  padding: 8px;
-  position: fixed;
-  right: 10px;
-  bottom: 70px;
-  background-color: #1f2937;
-  a {
-    display: block;
-    width: 32px;
-    height: 32px;
-    border-radius: 5px;
-    font-size: 0;
-    background-repeat: no-repeat;
-    background-position-x: center;
-    background-position-y: center;
-    transition-property: background-color;
-    transition-duration: 200ms;
-    :not(:last-child) {
-      margin-bottom: 8px;
-    }
-    &:hover,
-    &:focus {
-      background-color: rgba(255, 255, 255, 0.1);
-    }
-  }
-  .facebook {
-    background-image: url("../../../assets/icon-facebook.svg");
-  }
-  .youtube {
-    background-image: url("../../../assets/icon-youtube.png");
-    background-repeat: no-repeat;
-    background-size: contain;
-  }
 }
 
 .site-footer {

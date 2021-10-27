@@ -9,29 +9,26 @@
 </header>
 
 <div class="intro-section">
-    <h1>Angular HTML Table Example<br><br></h1>
-
-    <!-- <button type="button" class="button" (click)="displayUsers">Edit</button>
-    <button type="button" class="button">Delete</button> -->
+    <h1>
+    <button type="button" class="button" (click)="displayUsers">Edit</button>
+    <button type="button" class="button">Delete</button></h1><br>
     <br>
-    <div style="overflow-x:auto;">
+    <div style="overflow-y:auto;">
         <table>
             <thead>
                 <tr>
                     <th>#ID</th>
                     <th>Name</th>
-                    <th>Email</th>
                     <th>Age</th>
-                    <th>Password</th>
+                    <th>Email</th>
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let user of user1">
-                    <!-- <td>{{ user.id }}</td> -->
+                <tr *ngFor="let user of users">
+                    <td>{{ user.id }}</td>
                     <td>{{ user.name }}</td>
                     <td>{{ user.age }}</td>
                     <td>{{ user.email }}</td>
-                    <td>{{ user.password }}</td>
                     <!-- <td>
                 <button type="button" >Edit</button>
                 <button type="button" >Delete</button>
@@ -40,12 +37,6 @@
             </tbody>
         </table>
     </div>
-</div>
-
-
-<div class="social-links">
-    <a href="https://facebook.com/microtoph.143" target="_blank" class="facebook">Facebook</a>
-    <a href="https://www.youtube.com/channel/UCSDwltotavFWMity5FJLWUg" target="_blank" class="youtube">Instagram</a>
 </div>
 
 <footer class="site-footer">
