@@ -8,6 +8,10 @@ import { LoginComponent } from './screens/login/login.component';
 import { HttpClientModule } from '@angular/common/http';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RegisterComponent } from './screens/register/register.component';
+import { SharedModule } from './shared/shared.module';
+import { ApiService } from './shared/api.service';
+import { DefaultLayoutComponent } from './layouts/default-layout/default-layout.component';
+import { NavbarComponent } from './layouts/navbar/navbar.component';
 
 @NgModule({
   declarations: [
@@ -15,15 +19,17 @@ import { RegisterComponent } from './screens/register/register.component';
     LoginComponent,
     HomeComponent,
     RegisterComponent,
-    // RegisterComponent
+    DefaultLayoutComponent,
+    NavbarComponent,
   ],
   imports: [
     HttpClientModule,
     BrowserModule,
     AppRoutingModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    SharedModule
   ],
-  providers: [],
+  providers: [ApiService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
