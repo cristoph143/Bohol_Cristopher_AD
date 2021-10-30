@@ -97,7 +97,12 @@
       background-color: #f59e0b;
     }
   }
-  
+
+  #overflow{
+    overflow-y: auto;
+    overflow-x: auto;
+  }
+
   table {
     border-spacing: 0;
     width: 100%;

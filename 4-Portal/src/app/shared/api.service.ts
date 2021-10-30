@@ -17,4 +17,28 @@ export class ApiService {
       return null;
     }
   }
+  async get(url: string): Promise<any> {
+    try {
+      return await this.api.get(environment.API_URL+url).toPromise();
+    } catch (e) {
+      console.log(e);
+      return null;
+    }
+  }
+  async patch(url: string, body?:any): Promise<any> {
+    try {
+      return await this.api.patch(environment.API_URL+url,body).toPromise();
+    } catch (e) {
+      console.log(e);
+      return null;
+    }
+  }
+  async delete(url: string): Promise<any> {
+    try {
+      return await this.api.delete(environment.API_URL+url).toPromise();
+    } catch (e) {
+      console.log(e);
+      return null;
+    }
+  }
 }
