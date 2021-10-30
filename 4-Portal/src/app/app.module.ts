@@ -12,6 +12,8 @@ import { SharedModule } from './shared/shared.module';
 import { ApiService } from './shared/api.service';
 import { DefaultLayoutComponent } from './layouts/default-layout/default-layout.component';
 import { NavbarComponent } from './layouts/navbar/navbar.component';
+import { FooterComponent } from './layouts/footer/footer.component';
+import { UserComponent } from './user/user.component';
 
 @NgModule({
   declarations: [
@@ -21,6 +23,8 @@ import { NavbarComponent } from './layouts/navbar/navbar.component';
     RegisterComponent,
     DefaultLayoutComponent,
     NavbarComponent,
+    FooterComponent,
+    UserComponent,
   ],
   imports: [
     HttpClientModule,

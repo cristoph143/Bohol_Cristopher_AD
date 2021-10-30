@@ -1,0 +1,18 @@
+.site-footer {
+    padding: 20px 24px;
+    display:grid;
+    justify-content: center;
+    align-content: center;
+    text-align: center;
+    background-color: #f9fafb;
+    position: fixed;
+    height: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    margin-bottom: 0px;
+    p {
+      margin: 0;
+      color: #4b5563;
+    }
+}
