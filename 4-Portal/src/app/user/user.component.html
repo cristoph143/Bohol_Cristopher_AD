@@ -1,10 +1,27 @@
 <div class="intro-section">
-    <h1>
-    <button type="button" class="button" (click)="displayUsers">Edit</button>
-    <button type="button" class="button">Delete<br></button></h1>
-    <br>
+    <div class="left-side">
+        <div class="control">
+            <input type="search" placeholder="Type to Search" id="search" autocomplete="on">
+            <button type="button" class="button" id="search_button" (click)="displayUsers">Search</button>
+            <h3>User's Information</h3>
+            Name:<br><input type="text" name="name" id="name">
+            Age:<br><input type="text" name="age" id="age">
+            Email:<br><input type="email" name="lname" id="lname">
+        </div>
+        <div class="group-button">
+            <div class="upper-button">
+                <button type="button" class="button mar" (click)="displayUsers">Add User</button>
+                <button type="button" class="button" (click)="displayUsers">Edit</button>
+            </div>
+            <div class="lower-button">
+                <button type="button" class="button mar" (click)="displayUsers">Reset</button>
+                <button type="button" class="button" (click)="displayUsers">Delete</button>
+            </div>
+        </div>
+    </div>      
+    <br><br>
     <div id="overflow">
-        <table>
+        <table id="table">
             <thead>
                 <tr>
                     <th>#ID</th>
@@ -19,10 +36,6 @@
                     <td>{{ user.name }}</td>
                     <td>{{ user.age }}</td>
                     <td>{{ user.email }}</td>
-                    <!-- <td>
-                <button type="button" >Edit</button>
-                <button type="button" >Delete</button>
-                </td> -->
                 </tr>
             </tbody>
         </table>
