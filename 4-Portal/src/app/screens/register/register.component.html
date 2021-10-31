@@ -3,7 +3,7 @@
         <h1 class="shadows">Registration Form</h1>
         <!-- <p>{{ error }}</p>
         <p>{{ registerForm.value | json }}</p> -->
-        <p>{{ registerForm.status }}</p>
+        <!-- <p>{{ registerForm.status }}</p> -->
         <form class="inputs" [formGroup]="registerForm" (ngSubmit)="onSubmit()">
             <div class="control">
                 <label for="Name" class="txt shadows">Name</label>
@@ -30,7 +30,7 @@
             </span>
         <div class="control">
             <button type="submit" class="button" [disabled]="!registerForm.valid">Register</button>
-            <button type="submit" class="button" (click)="nav('login')">Log In</button>
+            <button type="submit" class="button" (click)="nav('login')">LogIn</button>
         </div>
         </form>
         <p><a href="#" class="shadows">Forget password ?</a></p>

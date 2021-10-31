@@ -1,38 +1,57 @@
 <div class="intro-section">
     <div class="left-side">
         <div class="control">
-            <input type="search" placeholder="Type to Search" id="search" autocomplete="on">
-            <button type="button" class="button" id="search_button" (click)="displayUsers">Search</button>
+            <input #term type="search" placeholder="Type to Search" id="search" autocomplete="on" />
+            <button type="button" class="button" id="search_button">
+                Search
+            </button>
             <h3>User's Information</h3>
-            Name:<br><input type="text" name="name" id="name">
-            Age:<br><input type="text" name="age" id="age">
-            Email:<br><input type="email" name="lname" id="lname">
+            <form class="inputs" [formGroup]="addUserForm" (ngSubmit)="onSubmit()">
+                <label for="id" class="txt">ID</label>
+                <input type="text" name="id" id="id" disabled="true"/> 
+                <label for="Name" class="txt">Name</label>
+                <input type="text" placeholder="Full Name" name="name" id="name" /> 
+                <label for="Age" class="txt">Age</label>
+                <input type="text" placeholder="Age" name="age" id="age" />
+                <label for="email" class="txt">Email</label>
+                <input type="email" placeholder="Email" name="email" id="email" />
+            </form>
         </div>
         <div class="group-button">
             <div class="upper-button">
-                <button type="button" class="button mar" (click)="displayUsers">Add User</button>
-                <button type="button" class="button" (click)="displayUsers">Edit</button>
+                <button type="button" class="button mar" (click)="(displayUsers)">
+                    Add User
+                </button>
+                <button type="button" class="button" (click)="(displayUsers)">
+                    Edit
+                </button>
             </div>
             <div class="lower-button">
-                <button type="button" class="button mar" (click)="displayUsers">Reset</button>
-                <button type="button" class="button" (click)="displayUsers">Delete</button>
+                <button type="button" class="button mar" (click)="resetDB()">
+                    Reset
+                </button>
+                <button type="button" class="button" (click)="(displayUsers)">
+                    Delete
+                </button>
             </div>
         </div>
-    </div>      
-    <br><br>
+    </div>
+    <br /><br />
     <div id="overflow">
         <table id="table">
             <thead>
                 <tr>
-                    <th>#ID</th>
+                    <th>#</th>
+                    <th>ID</th>
                     <th>Name</th>
                     <th>Age</th>
                     <th>Email</th>
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let user of users">
-                    <td>{{ user.id }}</td>
+                <tr *ngFor="let user of users, index as i">
+                    <td><a ng-click="retrieve(i)"> {{ i + 1 }} </a></td>
+                    <td (click)="rowSelected(user)">{{ user.id }}</td>
                     <td>{{ user.name }}</td>
                     <td>{{ user.age }}</td>
                     <td>{{ user.email }}</td>
