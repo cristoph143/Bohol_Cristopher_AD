@@ -3,7 +3,8 @@
         <a href="home" class="site-logo shadows">Cristopher Bohol</a>
 
         <nav class="site-nav">
-            <a routerLink="/login" class="shadows">SignOut</a>
+            <a class="shadows" *ngIf="auth.authenticated" (click)='clickHandler()'>SignOut</a>
+            <a class="shadows" *ngIf="!auth.authenticated" (click)="nav('login')">SignIn</a>
         </nav>
     </div>
 </header>
