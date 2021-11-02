@@ -8,13 +8,13 @@
             <h3>User's Information</h3>
             <form class="inputs" [formGroup]="addUserForm" (ngSubmit)="onSubmit()">
                 <label for="id" class="txt">ID</label>
-                <input type="text" name="id" id="id" disabled="true"/> 
+                <input type="text" name="id" id="id" formControlName="fcId" /> 
                 <label for="Name" class="txt">Name</label>
-                <input type="text" placeholder="Full Name" name="name" id="name" /> 
+                <input type="text" placeholder="Full Name" name="name" id="name" formControlName="fcName" /> 
                 <label for="Age" class="txt">Age</label>
-                <input type="text" placeholder="Age" name="age" id="age" />
+                <input type="text" placeholder="Age" name="age" id="age" formControlName="fcAge"/>
                 <label for="email" class="txt">Email</label>
-                <input type="email" placeholder="Email" name="email" id="email" />
+                <input type="email" placeholder="Email" name="email" id="email" formControlName="fcEmail"/>
             </form>
         </div>
         <div class="group-button">
@@ -30,7 +30,7 @@
                 <button type="button" class="button mar" (click)="resetDB()">
                     Reset
                 </button>
-                <button type="button" class="button" (click)="(displayUsers)">
+                <button type="button" class="button">
                     Delete
                 </button>
             </div>
