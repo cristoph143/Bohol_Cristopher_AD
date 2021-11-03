@@ -6,34 +6,40 @@
                 Search
             </button>
             <h3>User's Information</h3>
+            <p>{{ error }}</p>
+            <p>{{ addUserForm.value | json }}</p>
+            <p>{{ addUserForm.status }}</p>
             <form class="inputs" [formGroup]="addUserForm" (ngSubmit)="onSubmit()">
                 <label for="id" class="txt">ID</label>
-                <input type="text" name="id" id="id" formControlName="fcId" /> 
+                <input type="text" name="id" id="id" formControlName="fcId" />
                 <label for="Name" class="txt">Name</label>
-                <input type="text" placeholder="Full Name" name="name" id="name" formControlName="fcName" /> 
+                <input type="text" placeholder="Full Name" name="name" id="name" formControlName="fcName" />
                 <label for="Age" class="txt">Age</label>
-                <input type="text" placeholder="Age" name="age" id="age" formControlName="fcAge"/>
+                <input type="text" placeholder="Age" name="age" id="age" formControlName="fcAge" />
                 <label for="email" class="txt">Email</label>
-                <input type="email" placeholder="Email" name="email" id="email" formControlName="fcEmail"/>
+                <input type="email" placeholder="Email" name="email" id="email" formControlName="fcEmail" />
+                <label for="password" class="txt">Password</label>
+                <input type="password" placeholder="*********" name="password" id="password" formControlName="fcPassword" />
+                <div class="group-button">
+                    <div class="upper-button">
+                        <button type="button" class="button mar" (click)="addUser()"
+                            [disabled]="!addUserForm.valid">
+                            Add User
+                        </button>
+                        <button type="button" class="button" (click)="(displayUsers)">
+                            Edit
+                        </button>
+                    </div>
+                    <div class="lower-button">
+                        <button type="button" class="button mar" (click)="resetDB()">
+                            Reset
+                        </button>
+                        <button type="button" class="button">
+                            Delete
+                        </button>
+                    </div>
+                </div>
             </form>
-        </div>
-        <div class="group-button">
-            <div class="upper-button">
-                <button type="button" class="button mar" (click)="(displayUsers)">
-                    Add User
-                </button>
-                <button type="button" class="button" (click)="(displayUsers)">
-                    Edit
-                </button>
-            </div>
-            <div class="lower-button">
-                <button type="button" class="button mar" (click)="resetDB()">
-                    Reset
-                </button>
-                <button type="button" class="button">
-                    Delete
-                </button>
-            </div>
         </div>
     </div>
     <br /><br />
