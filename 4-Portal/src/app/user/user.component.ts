@@ -66,6 +66,9 @@ export class UserComponent implements OnInit {
     this.addUserForm.get('fcEmail')?.setValue(val);
   }
 
+  id?: any;
+  fname?: any;
+
   rowSelected(row: any) {
     console.log(row.id);
     // this.fcId.setValue(row.id);
@@ -73,24 +76,64 @@ export class UserComponent implements OnInit {
     this.name?.setValue(row.name);
     this.age?.setValue(row.age);
     this.email?.setValue(row.email);
+
+    console.log(this.fname)
+    console.log(this.id)
   }
 
   async addUser() {
     try {
-      var result: any = await this.api
-        .post(environment.API_URL + '/user/register', {
-          name: this.addUserForm.value.fcName,
-          age: this.addUserForm.value.fcAge,
-          email: this.addUserForm.value.fcEmail,
-          password: this.addUserForm.value.fcPassword,
-        })
-      console.log(result)
-      console.log('f')
-      if (result.success == true) {
-        this.nav('login');
+      
+      const id1 = this.ids;
+      console.log(id1)
+      var decision = confirm('Add User' + id1?.value);
+      if (decision == true) {
+
+        var result: any = await this.api
+          .post('/user/register', {
+            name: this.addUserForm.value.fcName,
+            age: this.addUserForm.value.fcAge,
+            email: this.addUserForm.value.fcEmail,
+            password: this.addUserForm.value.fcPassword,
+          });
+        console.log(result)
+        console.log('f')
+        if (result.success == true) {
+          this.nav('login');
+        }
+        else {
+          alert(result.data);
+        }
       }
-      else {
-        alert(result.data);
+    } catch (e) {
+      console.log(e);
+      console.log('---')
+    }
+  }
+
+  async editUser() {
+    try {
+      const id1 = this.ids;
+      console.log(id1)
+
+      var decision = confirm('Edit User' + id1?.value);
+      if (decision == true) {
+        var result: any = await this.api
+          .patch('/user/' + id1?.value, {
+            name: this.addUserForm.value.fcName,
+            age: this.addUserForm.value.fcAge,
+            email: this.addUserForm.value.fcEmail,
+            password: this.addUserForm.value.fcPassword,
+          });
+        console.log(result)
+        console.log('f')
+        if (result.success == true) {
+          // this.nav('login');
+          alert('success')
+        }
+        else {
+          alert(result.data);
+        }
       }
     } catch (e) {
       console.log(e);
@@ -102,14 +145,6 @@ export class UserComponent implements OnInit {
   error: string = '';
   onSubmit() {
     if (!this.addUserForm.valid) {
-      {
-        this.error = 'No fields must be empty';
-        console.log('exit')
-        alert(this.error);
-        return;
-      }
-    }
-    if (this.addUserForm.valid) {
       var payload: {
         name: string;
         email: string;
@@ -130,6 +165,8 @@ export class UserComponent implements OnInit {
 
   ngOnInit(): void {
     this.getData();
+    console.log(this.id);
+    console.log(this.fname)
   }
 
 
@@ -139,12 +176,17 @@ export class UserComponent implements OnInit {
     this.router.navigate([destination]);
   }
 
-  async deleteUser(i: number) {
-    var decision = confirm('Delete user ' + this.users[i].name);
-    if (decision) {
-      var result = await this.api.delete(`/user/${this.users[i].id}`);
+  async deleteUser() {
+    const id1 = this.ids;
+    const names = this.name;
+    console.log(id1?.value)
+    console.log(names?.value)
+    var decision = confirm('Delete user ' + names?.value);
+    if (decision == true) {
+      var result = await this.api.delete('/user/' + id1?.value,);
       if (result.success) {
-        this.getData();
+        console.log(this.getData());
+        alert('success')
       }
     }
   }
