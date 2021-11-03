@@ -27,6 +27,10 @@ export class UserComponent implements OnInit {
       fcEmail: new FormControl('', [
         Validators.required,
         Validators.email
+      ]),
+      fcPassword: new FormControl('', [
+        Validators.required,
+        Validators.pattern('^(?=.*[0-9])(?=.*[a-zA-Z])([a-zA-Z0-9]+)$')
       ])
     })
   }
@@ -35,6 +39,7 @@ export class UserComponent implements OnInit {
   fcName = new FormControl();
   fcAge = new FormControl();
   fcEmail = new FormControl();
+  fcPassword = new FormControl();
 
   set ids(val) {
     this.addUserForm.get('fcId')?.setValue(val);
@@ -42,7 +47,6 @@ export class UserComponent implements OnInit {
   get ids() {
     return this.addUserForm.get('fcId');
   }
-
   get name() {
     return this.addUserForm.get('fcName');
   }
@@ -62,8 +66,6 @@ export class UserComponent implements OnInit {
     this.addUserForm.get('fcEmail')?.setValue(val);
   }
 
-
-
   rowSelected(row: any) {
     console.log(row.id);
     // this.fcId.setValue(row.id);
@@ -73,20 +75,58 @@ export class UserComponent implements OnInit {
     this.email?.setValue(row.email);
   }
 
+  async addUser() {
+    try {
+      var result: any = await this.api
+        .post(environment.API_URL + '/user/register', {
+          name: this.addUserForm.value.fcName,
+          age: this.addUserForm.value.fcAge,
+          email: this.addUserForm.value.fcEmail,
+          password: this.addUserForm.value.fcPassword,
+        })
+      console.log(result)
+      console.log('f')
+      if (result.success == true) {
+        this.nav('login');
+      }
+      else {
+        alert(result.data);
+      }
+    } catch (e) {
+      console.log(e);
+      console.log('---')
+    }
+  }
 
-  // addUserForm: FormGroup = new FormGroup({
-  //   fcId: new FormControl('', Validators.required),
-  //   fcName: new FormControl('', Validators.required),
-  //   fcAge: new FormControl(0, [
-  //       Validators.required,
-  //       Validators.min(18), 
-  //       Validators.max(65)
-  //     ]),
-  //   fcEmail: new FormControl('', [
-  //       Validators.required,
-  //       Validators.email
-  //     ])
-  // });
+
+  error: string = '';
+  onSubmit() {
+    if (!this.addUserForm.valid) {
+      {
+        this.error = 'No fields must be empty';
+        console.log('exit')
+        alert(this.error);
+        return;
+      }
+    }
+    if (this.addUserForm.valid) {
+      var payload: {
+        name: string;
+        email: string;
+        age: number;
+        password: string;
+      };
+      payload = {
+        name: this.addUserForm.value.fcName,
+        age: this.addUserForm.value.fcAge,
+        email: this.addUserForm.value.fcEmail,
+        password: this.addUserForm.value.fcPassword
+      };
+      console.log(payload);
+      alert('Hellow')
+      this.addUser();
+    }
+  }
 
   ngOnInit(): void {
     this.getData();
@@ -108,6 +148,7 @@ export class UserComponent implements OnInit {
       }
     }
   }
+
 
   async resetDB() {
     var result = await this.api.patch('/user/reset');
@@ -175,31 +216,6 @@ export class UserComponent implements OnInit {
     }
     else {
       alert(result.data);
-    }
-  }
-
-  error: string = '';
-  onSubmit() {
-    if (!this.addUserForm.valid) {
-      {
-        this.error = 'No fields must be empty';
-        alert(this.error);
-        return;
-      }
-    }
-    if (this.addUserForm.valid) {
-      var payload: {
-        name: string;
-        email: string;
-        age: number;
-      };
-      payload = {
-        name: this.addUserForm.value.fcName,
-        age: this.addUserForm.value.fcAge,
-        email: this.addUserForm.value.fcEmail,
-      };
-      console.log(payload);
-      alert('Hellow')
     }
   }
 }
