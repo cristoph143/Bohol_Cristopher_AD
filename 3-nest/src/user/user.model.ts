@@ -233,15 +233,39 @@ export class User {
     //FIXME: return
     retTermResult(term: any): boolean {
         var keys: Array<string> = Helper.describeClass(User);
-        console.log(`Zero: ${keys} keys ${keys}\n`);
+        // console.log(`Zero: ${keys} keys ${keys}\n`);
         keys = Helper.removeItemOnce(keys, 'password');
-        console.log(`One: ${keys} keys ${keys}\n`);
+        // console.log(`One: ${keys} keys ${keys}\n`);
+        
+        let chck:boolean = false;
         for (const key of keys) {
             console.log(`Two: ${key} keys ${keys}\n`);
-            if (`${this[key]}` === term) return true;
-            console.log(`Three: ${key} keys ${keys}\n`);
+            if(key === 'email' ){
+                // console.log('--' + this[key].toLowerCase())
+                console.log(term)
+                if (`${this[key]}` === term) {
+                    console.log('--' + this[key] + '---' +term + '---');
+                    chck = true;
+                    break;
+                }
+            }
+            if(key === 'name' ){
+                // console.log('--' + this[key].toLowerCase())
+                if (`${this[key].toLowerCase()}` === term.toLowerCase()) {
+                    console.log('--' + this[key].toLowerCase() + '---' +term.toLowerCase() + '---');
+                    chck = true;
+                    break;
+                }
+            } 
+            if (`${this[key]}` === term) {
+                        console.log('--' + this[key] + '---' +term + '---');
+                chck = true;
+                break;
+            }
+            // console.log(`Three: ${key} keys ${keys}\n`);
         }
-        return false;
+        
+        return chck;
     }
 
     static async login(email: string, password: string): Promise<boolean> {

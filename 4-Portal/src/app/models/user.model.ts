@@ -11,6 +11,12 @@ export class User {
         this.email = email;
     }
 
+    // static userService(body?: any){
+    //     return body.name;
+    // }
+    
+    
+
     static fromJson(id: string, json: any): User | null {
         try {
             return new User(json.name, json.age, json.email, id);

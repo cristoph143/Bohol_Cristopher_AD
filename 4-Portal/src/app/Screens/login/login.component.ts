@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Validators } from '@angular/forms';
 import { ApiService } from 'src/app/shared/api.service';
+import { User } from '../../../../src/app/models/user.model';
 
 
 @Component({
@@ -31,6 +32,9 @@ export class LoginComponent implements OnInit {
         email: this.fcEmail.value,
         password: this.fcPassword.value,
       });
+      // console.log('---')
+      // console.log(result.data.name)
+      // User.userService(result.data.name)
     console.log(result)
     if (result.success == true) {
       this.nav('home');
