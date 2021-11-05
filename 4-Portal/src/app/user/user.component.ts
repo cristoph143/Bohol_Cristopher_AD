@@ -18,7 +18,6 @@ export class UserComponent implements OnInit {
 
   constructor(private router: Router, private api: ApiService, fb: FormBuilder) {
     this.addUserForm = fb.group({
-      fcId: new FormControl('', Validators.required),
       fcName: new FormControl('', Validators.required),
       fcAge: new FormControl(0, [
         Validators.required,
@@ -85,10 +84,7 @@ export class UserComponent implements OnInit {
 
   async addUser() {
     try {
-      
-      const id1 = this.ids;
-      console.log(id1)
-      var decision = confirm('Add User' + id1?.value);
+      var decision = confirm('Add User');
       if (decision == true) {
 
         var result: any = await this.api
