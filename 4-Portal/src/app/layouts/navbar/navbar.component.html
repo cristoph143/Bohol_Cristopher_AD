@@ -1,9 +1,9 @@
 <header class="site-header">
     <div class="site-header-contents">
-        <a href="home" class="site-logo shadows">Cristopher Bohol</a>
+        <a href="home" id="user" class="site-logo shadows"> {{ userName }} </a>
 
         <nav class="site-nav">
-            <a class="shadows" *ngIf="auth.authenticated" (click)='clickHandler()'>SignOut</a>
+            <a class="shadows" id="signout" *ngIf="auth.authenticated" (click)="clickHandler()">SignOut</a>
             <a class="shadows" *ngIf="!auth.authenticated" (click)="nav('login')">SignIn</a>
         </nav>
     </div>

@@ -4,6 +4,7 @@ import { FormGroup, FormControl, Validators, FormBuilder } from '@angular/forms'
 import { Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
 import { User } from '../models/user.model';
+import { Helper } from '../models/helper';
 import { ApiService } from '../shared/api.service';
 
 @Component({
@@ -17,7 +18,6 @@ export class UserComponent implements OnInit {
 
   constructor(private router: Router, private api: ApiService, fb: FormBuilder) {
     this.addUserForm = fb.group({
-      fcId: new FormControl('', Validators.required),
       fcName: new FormControl('', Validators.required),
       fcAge: new FormControl(0, [
         Validators.required,
@@ -40,6 +40,7 @@ export class UserComponent implements OnInit {
   fcAge = new FormControl();
   fcEmail = new FormControl();
   fcPassword = new FormControl();
+  fSearch = new FormControl();
 
   set ids(val) {
     this.addUserForm.get('fcId')?.setValue(val);
@@ -83,10 +84,7 @@ export class UserComponent implements OnInit {
 
   async addUser() {
     try {
-      
-      const id1 = this.ids;
-      console.log(id1)
-      var decision = confirm('Add User' + id1?.value);
+      var decision = confirm('Add User');
       if (decision == true) {
 
         var result: any = await this.api
@@ -99,7 +97,8 @@ export class UserComponent implements OnInit {
         console.log(result)
         console.log('f')
         if (result.success == true) {
-          this.nav('login');
+          this.nav('home');
+          this.clearFields()
         }
         else {
           alert(result.data);
@@ -133,6 +132,7 @@ export class UserComponent implements OnInit {
         }
         else {
           alert(result.data);
+          this.clearFields()
         }
       }
     } catch (e) {
@@ -141,9 +141,18 @@ export class UserComponent implements OnInit {
     }
   }
 
+  clearFields() {
+    this.addUserForm.controls.fcName.reset();
+    this.addUserForm.controls.fcAge.reset();
+    this.addUserForm.controls.fcEmail.reset();
+    this.addUserForm.controls.fcPassword.reset();
+    this.addUserForm.controls.fcSearch.reset();
+  }
+
 
   error: string = '';
   onSubmit() {
+    console.log('onsub')
     if (!this.addUserForm.valid) {
       var payload: {
         name: string;
@@ -163,10 +172,17 @@ export class UserComponent implements OnInit {
     }
   }
 
+  emp_name: string = '';
   ngOnInit(): void {
     this.getData();
     console.log(this.id);
     console.log(this.fname)
+    this.clearFields();
+
+    // this.fcName.setValue(this.emp_name);
+    // this.fcAge.setValue(0);
+    // this.fcEmail.setValue('');
+    this.fcPassword.setValue('');
   }
 
 
@@ -186,6 +202,7 @@ export class UserComponent implements OnInit {
       var result = await this.api.delete('/user/' + id1?.value,);
       if (result.success) {
         console.log(this.getData());
+        this.clearFields();
         alert('success')
       }
     }
@@ -193,14 +210,26 @@ export class UserComponent implements OnInit {
 
 
   async resetDB() {
-    var result = await this.api.patch('/user/reset');
-    this.getData();
-  }
-  async getData(term?: string) {
-    if (term == undefined || term == null) {
-      this.users = await this.getAll();
-      console.log(this.users);
+    var decision = confirm('Reset DB');
+    if (decision == true) {
+      this.getData();
+      var result = Helper.populate();
+      this.addUserForm.reset();
+      this.clearFields();
+      this.nav('home')
     }
+  }
+
+  async getData(term?: string) {
+    if (term != undefined || term != null || term != '') {
+      this.users = await this.getAll();
+    }
+    console.log(this.users);
+  }
+
+  searchValue = '';
+  clearSearch(){
+    this.clearFields();
   }
   async getAll(): Promise<Array<User>> {
     var result = await this.api.get('/user/all');
@@ -218,13 +247,20 @@ export class UserComponent implements OnInit {
   searchRestult = '';
 
   async search(query: string) {
-    this.getResult(await this.searchTerm(query));
+    if (query.trim() == '') return;
+    var result = await this.api.get('/user/search/' + query);
+    this.getResult(result);
+    alert(result)
+    console.log(result)
   }
+
 
   private getResult(result: any) {
     if (result.success) {
       this.users = this.toArray(result.data);
+      console.log('----')
       console.log(this.users);
+      console.log('----')
     } else {
       this.requestResult = result.data;
     }
@@ -235,17 +271,9 @@ export class UserComponent implements OnInit {
     for (var items in result) {
       list.push(result[items]);
     }
+    console.log(list)
 
     return list;
-  }
-
-  private async searchTerm(term: string): Promise<any> {
-    try {
-      return await this.api
-        .get(environment.API_URL + '/user/register' + term);
-    } catch (error) {
-      console.log(error);
-    }
   }
 
   async displayUsers() {

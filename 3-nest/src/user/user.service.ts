@@ -612,9 +612,9 @@ export class UserService {
     */
     async searchTerm(term: any): Promise<CRUDReturn> {
         //     try {
-                
+
         //         var dbData = await this.DB.collection("users").get();
-                var result: Array<User> = [];
+        var result: Array<User> = [];
         //         dbData.forEach((doc) => {
         //             var user = dbData;
         //             console.log(user)
@@ -639,38 +639,49 @@ export class UserService {
         //         }
         //     }
         // }
-        
+
         try {
-            var DB = admin.firestore();//connect to database
-            var dbData: FirebaseFirestore.QuerySnapshot<FirebaseFirestore.DocumentData> = await this.DB.collection("users").where('users', 'array-contains', term).get();
-            
-            var keys: Array<string> = Helper.describeClass(User);
-            for (const key of Object.keys(result)) {
-                this[key] = result[key];
-            }
-            console.log()
-            dbData.forEach((doc) => {
-                if (doc.exists) {
-                    var data = doc.data();
-                    // if(User[key] === term)
-                    result.push(new User(
-                        data["name"], data["age"], data["email"], data["password"], data["id"]
-                    ))
+            try {
+                var results: Array<any> = [];
+                var users: Array<User> = await this.getAllUserObject();
+                for (const user of users.values()) {
+                    if (user.retTermResult(term.toLowerCase())) results.push(user.toJson());
                 }
-                else{
-                    result = [];
-                }
-            });
-            console.log('result1 ' + result);
-            return {
-                success: true,
-                data: result
+                return { success: results.length > 0, data: results };
+            } catch (error) {
+                console.log(error.message);
+                return { success: false, data: error.message, };
             }
-            // var user;
-            // result.forEach((doc) => {
-            //     user = new user.User(doc.data());
+            // var DB = admin.firestore();//connect to database
+            // var dbData: FirebaseFirestore.QuerySnapshot<FirebaseFirestore.DocumentData> = await this.DB.collection("users").where('users', 'array-contains', term).get();
+
+            // var keys: Array<string> = Helper.describeClass(User);
+            // for (const key of Object.keys(result)) {
+            //     this[key] = result[key];
+            // }
+            // console.log()
+            // dbData.forEach((doc) => {
+            //     if (doc.exists) {
+            //         var data = doc.data();
+            //         // if(User[key] === term)
+            //         result.push(new User(
+            //             data["name"], data["age"], data["email"], data["password"], data["id"]
+            //         ))
+            //     }
+            //     else{
+            //         result = [];
+            //     }
             // });
-            // return user;
+            // console.log('result1 ' + result);
+            // return {
+            //     success: true,
+            //     data: result
+            // }
+            // // var user;
+            // // result.forEach((doc) => {
+            // //     user = new user.User(doc.data());
+            // // });
+            // // return user;
         }
         catch (error) {
             console.log(error);
@@ -680,21 +691,21 @@ export class UserService {
             }
         }
     }
-        // var resultData: Array<any> = [];
+    // var resultData: Array<any> = [];
 
-        // console.log('d')
-        // var result = this.DB.collection("users").doc(term).get();
+    // console.log('d')
+    // var result = this.DB.collection("users").doc(term).get();
 
-        // console.log(result)
-        // for (const user of this.users.values()) {
-        //     console.log('hello')
-        //     if (user.retTermResult(term)) {
-        //         console.log(user)
-        //         resultData.push(user.toJson());
-        //     }
-        // }
-        // return {
-        //     success: resultData.length > 0,
-        //     data: resultData
-        // };
+    // console.log(result)
+    // for (const user of this.users.values()) {
+    //     console.log('hello')
+    //     if (user.retTermResult(term)) {
+    //         console.log(user)
+    //         resultData.push(user.toJson());
+    //     }
+    // }
+    // return {
+    //     success: resultData.length > 0,
+    //     data: resultData
+    // };
 }
