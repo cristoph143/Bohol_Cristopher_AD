@@ -57,7 +57,7 @@
             </thead>
             <tbody>
                 <tr *ngFor="let user of users, index as i">
-                    <td><a ng-click="retrieve(i)"> {{ i + 1 }} </a></td>
+                    <td> {{ i + 1 }} </td>
                     <td (click)="rowSelected(user)">{{ user.id }}</td>
                     <td>{{ user.name }}</td>
                     <td>{{ user.age }}</td>

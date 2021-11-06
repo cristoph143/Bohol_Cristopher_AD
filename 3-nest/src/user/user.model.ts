@@ -236,6 +236,7 @@ export class User {
         // console.log(`Zero: ${keys} keys ${keys}\n`);
         keys = Helper.removeItemOnce(keys, 'password');
         // console.log(`One: ${keys} keys ${keys}\n`);
+        console.log('term' + term)
         
         let chck:boolean = false;
         for (const key of keys) {
@@ -243,8 +244,10 @@ export class User {
             if(key === 'email' ){
                 // console.log('--' + this[key].toLowerCase())
                 console.log(term)
-                if (`${this[key]}` === term) {
-                    console.log('--' + this[key] + '---' +term + '---');
+                // if (`${this[key]}` === term) {
+                if (`${this[key].toUpperCase()}` === term.toUpperCase()) {
+                    // console.log('--' + this[key] + '---' +term + '---');
+                    console.log('--' + this[key].toUpperCase() + '---' +term.toUpperCase() + '---');
                     chck = true;
                     break;
                 }

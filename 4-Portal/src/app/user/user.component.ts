@@ -70,7 +70,11 @@ export class UserComponent implements OnInit {
   id?: any;
   fname?: any;
 
+  
+  viewedUserIndex:number | undefined;
   rowSelected(row: any) {
+    this.userSelected = row;
+    console.log(this.userSelected)
     console.log(row.id);
     // this.fcId.setValue(row.id);
     this.ids?.setValue(row.id);
@@ -78,7 +82,9 @@ export class UserComponent implements OnInit {
     this.age?.setValue(row.age);
     this.email?.setValue(row.email);
 
+    // this.viewedUserIndex = i;
     console.log(this.fname)
+    console.log(this.viewedUserIndex)
     console.log(this.id)
   }
 
@@ -110,29 +116,31 @@ export class UserComponent implements OnInit {
     }
   }
 
+  
+  userSelected: any;
   async editUser() {
     try {
-      const id1 = this.ids;
-      console.log(id1)
+      const id1 = this.userSelected.id;
+    console.log(id1)
 
-      var decision = confirm('Edit User' + id1?.value);
+      var decision = confirm('Edit User? ');
       if (decision == true) {
         var result: any = await this.api
-          .patch('/user/' + id1?.value, {
+          .patch('/user/' + id1, {
             name: this.addUserForm.value.fcName,
             age: this.addUserForm.value.fcAge,
             email: this.addUserForm.value.fcEmail,
             password: this.addUserForm.value.fcPassword,
           });
         console.log(result)
-        console.log('f')
         if (result.success == true) {
-          // this.nav('login');
           alert('success')
+          this.nav('home')
+          this.clearFields()
         }
         else {
-          alert(result.data);
-          this.clearFields()
+          alert('Error')
+          this.nav('home')
         }
       }
     } catch (e) {
@@ -193,18 +201,21 @@ export class UserComponent implements OnInit {
   }
 
   async deleteUser() {
-    const id1 = this.ids;
-    const names = this.name;
-    console.log(id1?.value)
-    console.log(names?.value)
-    var decision = confirm('Delete user ' + names?.value);
+    const id1 = this.userSelected.id;
+    const names = this.userSelected.name;
+    console.log(id1)
+    console.log(names)
+    var decision = confirm('Delete user ' + names);
     if (decision == true) {
-      var result = await this.api.delete('/user/' + id1?.value,);
+      var result = await this.api.delete('/user/' + id1);
       if (result.success) {
         console.log(this.getData());
         this.clearFields();
         alert('success')
+        this.nav('home')
       }
+      alert('Error')
+      this.nav('home')
     }
   }
 
@@ -214,6 +225,7 @@ export class UserComponent implements OnInit {
     if (decision == true) {
       this.getData();
       var result = Helper.populate();
+      console.log(result)
       this.addUserForm.reset();
       this.clearFields();
       this.nav('home')
