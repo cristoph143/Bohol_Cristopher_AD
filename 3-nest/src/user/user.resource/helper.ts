@@ -74,25 +74,25 @@ export class Helper {
     //     }
     // }
 
-    static populate(): Map<string, User> {
-        var result: Map<string, User> = new Map<string, User>();
-        var users:Array<any> = [];
-        try {
-            for(var i = 0; i < 4; i++){
-                var result: Map<string, User> = new Map<string, User>();
-                var id:string = Helper.generateUID();
-                var name:string = Helper.full_name();
-                var pwd: string = Helper.pwd();
-                var age: number = Helper.age();
-                var email: string = Helper.email(name);
-                result.set(id,new User(name,age,email,pwd,id));
-            }
-        return result;
-        } catch (error) {
-        console.log(error);
-        return null;
-        }
-    }
+    // static populate(): Map<string, User> {
+    //     var result: Map<string, User> = new Map<string, User>();
+    //     var users:Array<any> = [];
+    //     try {
+    //         for(var i = 0; i < 4; i++){
+    //             var result: Map<string, User> = new Map<string, User>();
+    //             var id:string = Helper.generateUID();
+    //             var name:string = Helper.full_name();
+    //             var pwd: string = Helper.pwd();
+    //             var age: number = Helper.age();
+    //             var email: string = Helper.email(name);
+    //             result.set(id,new User(name,age,email,pwd,id));
+    //         }
+    //     return result;
+    //     } catch (error) {
+    //     console.log(error);
+    //     return null;
+    //     }
+    // }
 
     static validBody(body: any): { valid: boolean; data: string } {
         try {

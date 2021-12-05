@@ -3,11 +3,13 @@ import { Injectable } from '@nestjs/common';
 import { User } from './user.model';
 import { CRUDReturn } from './user.resource/crud_return.interface';
 import { Helper } from './user.resource/helper';
+import { auth } from 'firebase-admin';
 
 @Injectable()
 export class UserService {
     private users: Map<string, User> = new Map<string, User>();
     private DB = admin.firestore();
+    private AUTH: auth.Auth = admin.auth();
 
     // constructor() {
     // //     // this. = Helper.populate();
@@ -36,12 +38,25 @@ export class UserService {
                 console.log(chck);
                 chck = await User.validationEmail(body.email);
                 if (chck === true) {
+                    var authCreationResult: auth.UserRecord;
+                    try {
+                        authCreationResult = await this.AUTH.createUser({
+                            email: body.email, password: body.password
+                        });
+                    }
+                    catch (error) {
+                        console.log(error.message);
+                        return { success: false, data: error.message }
+                    }
                     var id: string = Helper.generateUID();
                     var newUser: User = new User(
                         body?.name,
                         body?.age,
-                        body?.email,
-                        body?.password);
+                        authCreationResult.email,
+                        authCreationResult.uid,
+                        // body?.email,
+                        // body?.password
+                    );
                     console.log("id: " + id);
                     chck = await this.saveToDataBase(newUser);
                     if (chck === true) {
@@ -182,7 +197,7 @@ export class UserService {
                 if (doc.exists) {
                     var data = doc.data();
                     result.push(new User(
-                        data["name"], data["age"], data["email"], data["password"], data["id"]
+                        data["name"], data["age"], data["email"], data["id"]
                     ))
                 }
             });
@@ -196,16 +211,16 @@ export class UserService {
         }
     }
 
-    populate() {
-        var id: string = Helper.generateUID();
-        this.users.set(id, new User('Leanne Graham', 18, 'sincere@april.biz', 'LG_123456', id));
-        id = Helper.generateUID();
-        this.users.set(id, new User('Nathan Plains', 25, 'nathan@yesenia.net', 'NP_812415', id));
-        id = Helper.generateUID();
-        this.users.set(id, new User('Ervin Howell', 21, 'shanna@melissa.tv', 'EH_123123', id));
-        id = Helper.generateUID();
-        this.users.set(id, new User('Patricia Lebsack', 18, 'patty@kory.org', 'PL_12345', id));
-    }
+    // populate() {
+    //     var id: string = Helper.generateUID();
+    //     this.users.set(id, new User('Leanne Graham', 18, 'sincere@april.biz', 'LG_123456', id));
+    //     id = Helper.generateUID();
+    //     this.users.set(id, new User('Nathan Plains', 25, 'nathan@yesenia.net', 'NP_812415', id));
+    //     id = Helper.generateUID();
+    //     this.users.set(id, new User('Ervin Howell', 21, 'shanna@melissa.tv', 'EH_123123', id));
+    //     id = Helper.generateUID();
+    //     this.users.set(id, new User('Patricia Lebsack', 18, 'patty@kory.org', 'PL_12345', id));
+    // }
 
     async logAllUsers(): Promise<CRUDReturn> {
         this.lines();
@@ -229,41 +244,64 @@ export class UserService {
     */
     async getID(id: string): Promise<CRUDReturn> {
         var chck: boolean;
-
         try {
-
-            chck = await this.searchID(id);
-            console.log('ID: id ' + id + ' Check ' + chck)
-            if (chck === true) {
-                console.log('t')
-                var dbData: {};
-                // for (const [key, user] of this.users.entries()) {
-                // chck = await User.validateID(id);
-                // if (chck === false) {
-                console.log(`Break : ${chck}`)
-                dbData = await User.retrieveDB(id);
-                console.log(dbData)
-                // break;
-                // }
-                // }
+            var result = await this.DB.collection("users").doc(id).get();
+            if (result.exists) {
+                var temp: {} = result.data();
+                temp['id'] = result.id;
                 return {
-                    success: chck,
-                    data: dbData
+                    success: true,
+                    data: temp,
                 };
-            }
-            else {
+            } else {
                 return {
                     success: false,
-                    data: `User ${id} is not in database`,
+                    data: `User ${id} does not exist in database!`,
                 };
             }
-        } catch (e) {
-
+        } catch (error) {
+            console.log("Get one error");
+            console.log(error.message);
             return {
                 success: false,
-                data: e.message,
+                data: error.message,
             };
         }
+
+        // try {
+
+        //     chck = await this.searchID(id);
+        //     console.log('ID: id ' + id + ' Check ' + chck)
+        //     if (chck === true) {
+        //         console.log('t')
+        //         var dbData: {};
+        //         // for (const [key, user] of this.users.entries()) {
+        //         // chck = await User.validateID(id);
+        //         // if (chck === false) {
+        //         console.log(`Break : ${chck}`)
+        //         dbData = await User.retrieveDB(id);
+        //         console.log(dbData)
+        //         // break;
+        //         // }
+        //         // }
+        //         return {
+        //             success: chck,
+        //             data: dbData
+        //         };
+        //     }
+        //     else {
+        //         return {
+        //             success: false,
+        //             data: `User ${id} is not in database`,
+        //         };
+        //     }
+        // } catch (e) {
+
+        //     return {
+        //         success: false,
+        //         data: e.message,
+        //     };
+        // }
 
     }
 
@@ -302,7 +340,7 @@ export class UserService {
                                 body?.name,
                                 body?.age,
                                 body?.email,
-                                body?.password,
+                                // body?.password,
                                 id);
                             chck = await this.saveToDataBase(newUser);
                             if (chck === true) {
@@ -518,65 +556,65 @@ export class UserService {
 
     }
 
-    async login(body: any): Promise<CRUDReturn> {
-        var chck: boolean;
-        var resultData: {};
-        try {
-            var validBody: {
-                valid: boolean;
-                data: string
-            } = Helper.validBody(body);
-            if (validBody.valid) {
-                // for (const [key, user] of this.users.entries()) {
-                chck = await User.validationEmail(body.email);
-                console.log(chck)
-                // if (chck === false) break;
-                // }
-                if (chck === false) {
-                    var result = this.DB.collection("users").where("email", "==", body.email).where("password", "==", body.password);
-                    // console.log(result);
-                    // resultData = await User.retrieveDB
-                    // for (const [key, user] of this.users.entries()) {
-                    chck = await User.login(body.email, body.password);
-                    // if (chck === true) {
-                    var user = await this.loginCred(body.email, body.password);
+    // async login(body: any): Promise<CRUDReturn> {
+    //     var chck: boolean;
+    //     var resultData: {};
+    //     try {
+    //         var validBody: {
+    //             valid: boolean;
+    //             data: string
+    //         } = Helper.validBody(body);
+    //         if (validBody.valid) {
+    //             // for (const [key, user] of this.users.entries()) {
+    //             chck = await User.validationEmail(body.email);
+    //             console.log(chck)
+    //             // if (chck === false) break;
+    //             // }
+    //             if (chck === false) {
+    //                 var result = this.DB.collection("users").where("email", "==", body.email).where("password", "==", body.password);
+    //                 // console.log(result);
+    //                 // resultData = await User.retrieveDB
+    //                 // for (const [key, user] of this.users.entries()) {
+    //                 chck = await User.login(body.email, body.password);
+    //                 // if (chck === true) {
+    //                 var user = await this.loginCred(body.email, body.password);
 
-                    console.log(user)
-                    var keys: Array<string> = Helper.describeClass(User);
-                    // keys = Helper.removeItemOnce(keys, 'password');
-                    // console.log(keys)
-                    for (const key of Object.keys(result)) {
-                        this[key] = result[key];
-                    }
-                    console.log('result1 ' + result);
+    //                 console.log(user)
+    //                 var keys: Array<string> = Helper.describeClass(User);
+    //                 // keys = Helper.removeItemOnce(keys, 'password');
+    //                 // console.log(keys)
+    //                 for (const key of Object.keys(result)) {
+    //                     this[key] = result[key];
+    //                 }
+    //                 console.log('result1 ' + result);
 
-                    // delete result.password;
-                    if (chck === true) {
-                        return {
-                            success: chck,
-                            data: user.pop()
-                        };
-                    }
-                    else {
-                        throw new Error(`${body.email} login fail, Email does not match with the password`);
-                    }
-                }
-                else {
-                    throw new Error(`${body.email} login fail, Email does not exist in the database!`);
-                }
-            }
-            else {
-                console.log('Hello There')
-                throw new Error(validBody.data);
-            }
-        } catch (error) {
-            console.log('hi there')
-            return {
-                success: false,
-                data: error.message
-            };
-        }
-    }
+    //                 // delete result.password;
+    //                 if (chck === true) {
+    //                     return {
+    //                         success: chck,
+    //                         data: user.pop()
+    //                     };
+    //                 }
+    //                 else {
+    //                     throw new Error(`${body.email} login fail, Email does not match with the password`);
+    //                 }
+    //             }
+    //             else {
+    //                 throw new Error(`${body.email} login fail, Email does not exist in the database!`);
+    //             }
+    //         }
+    //         else {
+    //             console.log('Hello There')
+    //             throw new Error(validBody.data);
+    //         }
+    //     } catch (error) {
+    //         console.log('hi there')
+    //         return {
+    //             success: false,
+    //             data: error.message
+    //         };
+    //     }
+    // }
 
 
     async loginCred(email: string, password: string) {
@@ -589,7 +627,7 @@ export class UserService {
                 if (doc.exists) {
                     var data = doc.data();
                     result.push(new User(
-                        data["name"], data["age"], data["email"], data["password"], data["id"]
+                        data["name"], data["age"], data["email"], data["id"]
                     ))
                 }
             });
