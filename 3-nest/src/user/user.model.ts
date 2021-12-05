@@ -8,9 +8,9 @@ export class User {
     private name: string;
     private age: number;
     private email: string;
-    private password: string;
+    // private password: string;
 
-    constructor(name: string, age: number, email: string, password: string, id?: string) {
+    constructor(name: string, age: number, email: string, id?: string) {
         if (id !== undefined) {
             this.id = id;
         } else {
@@ -19,7 +19,7 @@ export class User {
         this.name = name;
         this.age = age;
         this.email = email;
-        this.password = password;
+        // this.password = password;
     }
 
     /*
@@ -34,7 +34,9 @@ export class User {
             var result = await DB.collection("users").doc(id).get();//Get the Data from the Database
             if (result.exists) {//if users exist then register it to the local database(user.model.ts)
                 var data = result.data();//callback fnc
-                return new User(data['name'], data['age'], data['email'], data['password'], result.id)
+                // return new User(data['name'], data['age'], data['email'], data['password'], result.id)
+                
+                return new User(data['name'], data['age'], data['email'], result.id)
             }
         } catch (error) {
             console.log(error);
@@ -75,7 +77,7 @@ export class User {
             name: body.name,
             age: body.age,
             email: body.email,
-            password: body.password
+            // password: body.password
         }
     }
 
@@ -85,7 +87,7 @@ export class User {
             name: this.name,
             age: this.age,
             email: this.email,
-            password: this.password
+            // password: this.password
         }
     }
     toJson2() {
@@ -317,7 +319,7 @@ export class User {
     }
 
     pri() {
-        console.log(`DID: ${this.id}\nName: ${this.name}\nAge: ${this.age}\nEmail: ${this.email}\nPassword: ${this.password}\n---End---\n`);
+        console.log(`DID: ${this.id}\nName: ${this.name}\nAge: ${this.age}\nEmail: ${this.email}\nPassword: this.password\n---End---\n`);
     }
 }
 

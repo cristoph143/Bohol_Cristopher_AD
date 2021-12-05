@@ -1,5 +1,6 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
+import { AuthGuard} from 'src/guards/auth.guard';
 
 @Controller('user')
 export class UserController {
@@ -53,6 +54,7 @@ export class UserController {
     > Purpose:
         > Returns data about a user, password must NOT be returned
     */
+    @UseGuards(AuthGuard)
     @Get("/:id")
     getID(@Param('id') id:string){
         return this.userService.getID(id);
@@ -120,10 +122,10 @@ export class UserController {
             }, 
         so you can return success/error messages
     */
-    @Post('/login')
-    login(@Body() body:any){
-        return this.userService.login(body);
-    }
+    // @Post('/login')
+    // login(@Body() body:any){
+    //     return this.userService.login(body);
+    // }
 
     /* 
     > Method: @Get
@@ -140,3 +142,5 @@ export class UserController {
     }
 
 }
+
+
