@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AuthService } from 'src/app/shared/auth.service';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -11,7 +12,7 @@ import { environment } from 'src/environments/environment';
 })
 export class RegisterComponent implements OnInit {
 
-  constructor(private router: Router, private api: HttpClient) { }
+  constructor(private router: Router, private api: HttpClient, private auth: AuthService) { }
 
   ngOnInit(): void {
   }
@@ -47,12 +48,13 @@ export class RegisterComponent implements OnInit {
       })
       .toPromise();
     console.log(result)
-    if (result.success == true) {
-      this.nav('login');
-    }
-    else {
-      alert(result.data);
-    }
+    // if (result.success == true) {
+    //   this.nav('login');
+    // }
+    // else {
+    //   alert(result.data);
+    // }
+    
   }
 
 
@@ -87,7 +89,11 @@ export class RegisterComponent implements OnInit {
       };
       console.log(payload);
       alert('Hellow')
-      this.register();
+      // this.register();
+      this.auth.register(payload).then(data=>{
+        if(!data.success) this.error = data.data;
+        else this.nav("home");
+      });
     }
   }
 
