@@ -1,5 +1,14 @@
 {
   "projects": {
     "default": "sampleprojectadsem1-ca3be"
+  },
+  "targets": {
+    "sampleprojectadsem1-ca3be": {
+      "hosting": {
+        "portal": [
+          "sampleprojectadsem1-ca3be"
+        ]
+      }
+    }
   }
 }
