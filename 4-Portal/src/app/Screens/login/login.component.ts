@@ -56,6 +56,7 @@ export class LoginComponent implements OnInit {
       console.log(result);
       if (!this.auth.authenticated) {
         this.error = result.data;
+        alert(result.data);
       }
     } catch (e) {
       console.log(e);
