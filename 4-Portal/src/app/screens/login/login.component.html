@@ -8,7 +8,6 @@
             <div class="control">
                 <label for="psw" class="shadows">Password</label>
                 <input type="password" placeholder="*********" id="password" [formControl]="fcPassword" required>
-                <h5 *ngIf="error!=''">{{error}}</h5>
             </div>
         <div class="control">
             <button type="submit" class="button" (click)="nav('register')">Register</button>
